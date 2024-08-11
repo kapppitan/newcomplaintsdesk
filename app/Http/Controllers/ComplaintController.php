@@ -25,6 +25,8 @@ class ComplaintController extends Controller
         $file = $request->file('file')->store('evidence');
         $complaint->image_path = $file;
 
+        $complaint->office_id = $request->input('recipient');
+
         $complaint->save();
         
         return redirect('/')->with('error', false);

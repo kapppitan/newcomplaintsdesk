@@ -11,7 +11,7 @@
     </head>
 
     <body class="bg-light h-100">
-        <nav class="bg-danger p-2 px-3 d-flex">
+        <nav class="bg-danger p-3 px-4 d-flex">
             <h3 class="text-light m-0 d-flex">WMSU Complaints Desk</h3>
         </nav>
 
