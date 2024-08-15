@@ -4,9 +4,17 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Complaints;
+use App\Models\Office;
 
 class ComplaintController extends Controller
 {
+    public function index(Request $request)
+    {
+        $offices = Office::all();
+
+        return view('complaint')->with('offices', $offices);
+    }
+
     public function create(Request $request) 
     {
         $request->validate([
@@ -29,6 +37,6 @@ class ComplaintController extends Controller
 
         $complaint->save();
         
-        return redirect('/')->with('error', false);
+        return redirect('/')->with('success', true);
     }
 }

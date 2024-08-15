@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Carbon\Carbon;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+class OfficeController extends Controller
+{
+    public function login (Request $request)
+    {
+        $credentials = $request->only('username', 'password');
+
+        if(Auth::attempt($credentials)) {
+            $user = User::where('username', $request->username)->first();
+            $user->last_activity = Carbon::now();
+            $user->save();
+
+            if($user->office_id == 1) {
+                return redirect('/qao');
+            }
+        } else {
+            return redirect('/login')->with('error', true);
+        }
+    }
+
+    public function logout (Request $request)
+    {
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/login');
+    }
+}
