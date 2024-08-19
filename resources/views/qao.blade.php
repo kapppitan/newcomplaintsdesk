@@ -35,8 +35,11 @@
                     </li>
 
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link bg-danger text-light d-flex" id="btn-ongoing" data-bs-toggle="pill" data-bs-target="#tab-ongoing" type="button" role="tab" aria-controls="btn-ongoing" aria-selected="false">
-                            <i class="bi-inbox-fill me-2"></i>Ongoing
+                        <button class="nav-link bg-danger text-light d-flex align-items-center" id="btn-pending" data-bs-toggle="pill" data-bs-target="#tab-pending" type="button" role="tab" aria-controls="btn-pending" aria-selected="false">
+                            <div class="me-auto">
+                                <i class="bi-inbox-fill me-2"></i>Pending
+                            </div>
+                            <span class="badge">{{ $pending }}</span>
                         </button>
                     </li>
 
@@ -68,27 +71,43 @@
 
             <div class="col-9 tab-content p-3 h-100" id="tabContent">
                 <div class="tab-pane fade flex-column show active" id="tab-overview" role="tabpanel" aria-labelledby="btn-overview" tabindex="0">
-                    <h5>Overview</h5>
+                    <h5 class="text-secondary-emphasis">Overview</h5>
                     <hr class="border-2">
                 </div>
                 
-                <div class="tab-pane fade flex-column" id="tab-ongoing" role="tabpanel" aria-labelledby="btn-ongoing" tabindex="0">
-                    <h5>Ongoing Cases</h5>
+                <div class="tab-pane fade flex-column" id="tab-pending" role="tabpanel" aria-labelledby="btn-peding" tabindex="0">
+                    <h5 class="text-secondary-emphasis">Pending Cases</h5>
                     <hr class="border-2">
+
+                    <input class="form-control mb-2 w-25 ms-auto" type="search" name="search" placeholder="Search...">
+
+                    <div class="list-group">
+                        @foreach ($complaints as $complaint)
+                            <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">{{ $complaint->complaint_type }}</h5>
+                                    <small>{{ $complaint->created_at->diffForHumans() }}</small>
+                                </div>
+
+                                <p class="mb-1">{{ $complaint->details }}</p>
+                                <small class="text-secondary" style="font-size: 12px;">Submitted by: {{ $complaint->name }}</small>
+                            </a>
+                        @endforeach
+                    </div>
                 </div>
                 
                 <div class="tab-pane fade flex-column" id="tab-closed" role="tabpanel" aria-labelledby="btn-closed" tabindex="0">
-                    <h5>Closed Cases</h5>
+                    <h5 class="text-secondary-emphasis">Closed Cases</h5>
                     <hr class="border-2">
                 </div>
                 
                 <div class="tab-pane fade flex-column" id="tab-archived" role="tabpanel" aria-labelledby="btn-archived" tabindex="0">
-                    <h5>Archived Cases</h5>
+                    <h5 class="text-secondary-emphasis">Archived Cases</h5>
                     <hr class="border-2">
                 </div>
                 
                 <div class="tab-pane fade flex-column" id="tab-management" role="tabpanel" aria-labelledby="btn-management" tabindex="0">
-                    <h5>Account Management</h5>
+                    <h5 class="text-secondary-emphasis">Account Management</h5>
                     <hr class="border-2">
                 </div>
             </div>

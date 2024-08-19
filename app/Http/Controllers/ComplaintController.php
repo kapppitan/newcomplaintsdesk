@@ -8,14 +8,14 @@ use App\Models\Office;
 
 class ComplaintController extends Controller
 {
-    public function index(Request $request)
+    public function index (Request $request)
     {
         $offices = Office::all();
 
-        return view('complaint')->with('offices', $offices);
+        return view('page')->with('offices', $offices);
     }
 
-    public function create(Request $request) 
+    public function create (Request $request) 
     {
         $request->validate([
             'phone' => 'required|string|min:8|max:11',
@@ -38,5 +38,12 @@ class ComplaintController extends Controller
         $complaint->save();
         
         return redirect('/')->with('success', true);
+    }
+
+    public function view ($id)
+    {
+        $complaint = Complaints::where('id', $id)->first();
+
+        return view('complaint')->with('complaint', $complaint);
     }
 }

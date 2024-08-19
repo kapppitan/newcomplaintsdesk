@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Carbon\Carbon;
 use App\Models\User;
+use App\Models\Complaints;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -34,5 +35,13 @@ class OfficeController extends Controller
         $request->session()->regenerateToken();
 
         return redirect('/login');
+    }
+
+    public function index (Request $request)
+    {
+        $complaints = Complaints::all();
+        $count = Complaints::where('status', 0)->get()->count();
+
+        return view('qao')->with(['complaints'=> $complaints, 'pending' => $count]);
     }
 }
