@@ -21,8 +21,8 @@
         <title>Complaints Desk | QAO</title>
     </head>
 
-    <body class="bg-light d-flex">
-        <div class="row m-0">
+    <body class="bg-light vh-100 d-flex">
+        <div class="row w-100 m-0">
             <div class="col-3 bg-danger p-3 d-flex flex-column">
                 <h3 class="text-light">TITLE</h3>
                 <hr class="border-light border-2">
