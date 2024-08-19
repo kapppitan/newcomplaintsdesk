@@ -10,8 +10,16 @@
         <title>{{ $complaint->details }}</title>
     </head>
 
-    <body>
-        This is a test
+    <body class="bg-light vh-100">
+        <div class="row w-100 m-0">
+            <div class="col-8">
+                Column 1
+            </div>
+
+            <div class="col-4">
+                Column 2
+            </div>
+        </div>
 
         <script src="{{ asset('js/jquery-3.7.1.min.js') }}"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>

@@ -11,7 +11,7 @@
     </head>
 
     <body class="bg-danger w-100 vh-100 justify-content-center align-items-center d-flex">
-        <form method="post" action="{{ route('login') }}" class="bg-light d-flex flex-column gap-2 p-3 pt-5 rounded-3 w-25" style="height: fit-content;">
+        <form method="post" action="{{ route('login') }}" class="bg-light d-flex flex-column gap-2 p-3 pt-5 rounded-3" style="height: fit-content;">
             @csrf
 
             <h2 class="text-center text-danger mb-5">WMSU Complaints Desk</h2>

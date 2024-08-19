@@ -15,11 +15,10 @@
     <nav class="bg-danger p-3 px-4 d-flex">
         <h3 class="text-light m-0 d-flex">WMSU Complaints Desk</h3>
     </nav>
-    
 
-    <form class="d-flex p-3 gap-2" method="post" action="{{ route('complain') }}" enctype="multipart/form-data">
+    <form class="p-3 d-flex row gap-2 justify-content-center m-0" method="post" action="{{ route('complain') }}" enctype="multipart/form-data">
         @csrf
-        <div class="container p-0 d-flex gap-2 flex-column">
+        <div class="p-0 d-flex gap-2 flex-column col-md-8">
             <div class="form-group">
                 <label class="form-label m-0" for="type">Type of Complaint</label>
                 <select class="form-select border-danger border-2" name="complaint_type" required>
@@ -38,7 +37,7 @@
             </div>
         </div>
 
-        <div class="container p-0 d-flex gap-2 flex-column">
+        <div class="p-0 d-flex gap-2 flex-column col-md-3">
             <div class="form-group">
                 <label class="form-label m-0" for="name">Complainant's Name</label>
                 <div class="input-group d-flex p-0">
@@ -70,7 +69,7 @@
                 </select>
             </div>
 
-            <div class="form-group">
+            <div class="form-group mb-2">
                 <label class="form-label m-0" for="evidence">Evidence</label>
                 <input class="form-control border-danger border-2" name="file" type="file" required>
             </div>
