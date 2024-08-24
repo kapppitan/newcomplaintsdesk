@@ -40,14 +40,15 @@
         <div class="p-0 d-flex gap-2 flex-column col-md-3">
             <div class="form-group">
                 <label class="form-label m-0" for="name">Complainant's Name</label>
-                <div class="input-group d-flex p-0">
-                    <input class="form-control border-danger border-2 w-50 border-end-0" type="text" name="name" style="text-transform: capitalize;" required>
-                    <select class="form-select border-danger border-2" name="user_type" required>
-                        <option value="1">Student</option>
-                        <option value="2">Alumni</option>
-                        <option value="3">Staff</option>
-                    </select>
-                </div>
+                <input class="form-control border-danger border-2" type="text" name="name" style="text-transform: capitalize;" required>
+            </div>
+
+            <div class="form-group">
+                <select class="form-select border-danger border-2 w-20" name="user_type" required>
+                    <option value="1">Student</option>
+                    <option value="2">Alumni</option>
+                    <option value="3">Staff</option>
+                </select>
             </div>
 
             <div class="form-group">

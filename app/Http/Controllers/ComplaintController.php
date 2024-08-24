@@ -43,7 +43,8 @@ class ComplaintController extends Controller
     public function view ($id)
     {
         $complaint = Complaints::where('id', $id)->first();
+        $office = Office::where('id', $complaint->office_id)->first();
 
-        return view('complaint')->with('complaint', $complaint);
+        return view('complaint')->with(['complaint' => $complaint, 'office' => $office]);
     }
 }

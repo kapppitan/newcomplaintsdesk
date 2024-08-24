@@ -24,7 +24,7 @@
     <body class="bg-light vh-100 d-flex">
         <div class="row w-100 m-0">
             <div class="col-3 bg-danger p-3 d-flex flex-column">
-                <h3 class="text-light">TITLE</h3>
+                <h3 class="text-light">title here</h3>
                 <hr class="border-light border-2">
 
                 <ul class="nav nav-pills nav-fill flex-column mb-auto gap-2" role="tablist" id="nav">
@@ -109,6 +109,54 @@
                 <div class="tab-pane fade flex-column" id="tab-management" role="tabpanel" aria-labelledby="btn-management" tabindex="0">
                     <h5 class="text-secondary-emphasis">Account Management</h5>
                     <hr class="border-2">
+
+                    <form class="mb-5 w-50" method="post">
+                        @csrf
+
+                        <div class="input-group mb-2">
+                            <span class="input-group-text w-25" id="name-wrap">Username</span>
+                            <input class="form-control" type="text" aria-describedby="name-wrap">
+                        </div>
+
+                        <div class="input-group mb-2">
+                            <span class="input-group-text w-25" id="password-wrap">Password</span>
+                            <input class="form-control" type="text" aria-describedby="password-wrap">
+                        </div>
+
+                        <div class="input-group mb-2">
+                            <label class="input-group-text w-25" for="office">Office</label>
+                            <select class="form-select" name="office">
+                                @foreach ($offices as $office)
+                                    <option value="{{ $office->id }}">{{ $office->office_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <input class="btn btn-danger" type="submit" value="Create Account">
+                    </form>
+
+                    <h5 class="text-secondary-emphasis">Accounts</h5>
+                    <hr class="border-2">
+
+                    <div class="accordion" id="office-list">
+                        @foreach ($offices as $office)
+                            <div class="accordion-item">
+                                <h2 class="accordion-header">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#1" aria-expanded="false" aria-controls="1">
+                                        {{ $office->office_name }}
+                                    </button>
+                                </h2>
+
+                                <div class="accordion-collapse collapse" data-bs-parent="#office-list" id="1">
+                                    <div class="accordion-body">
+                                        @foreach ($office->users as $user)
+                                            {{ $user->username }}
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
             </div>
         </div>
