@@ -19,7 +19,18 @@
             <div class="col-sm-7">
                 <div class="form-group h-100">
                     <label class="form-label" for="details">Details</label>
-                    <textarea class="form-control mb-2" rows="17" style="resize: none;" name="details" disabled>{{ $complaint->details }}</textarea>
+                    <textarea class="form-control mb-2" rows="15" style="resize: none;" name="details" disabled>{{ $complaint->details }}</textarea>
+                
+                    <form class="input-group">
+                        @csrf
+                        <select class="form-select" name="status">
+                            <option value="1">Legitimate</option>
+                            <option value="1">Illegitimate/Non-conforming</option>
+                            <option value="1">Inquiry</option>
+                        </select>
+
+                        <button class="btn btn-danger" type="submit">Update Status</button>
+                    </form>
                 </div>
             </div>
 
@@ -45,8 +56,10 @@
                     </div>
                 </div>
 
-                <button class="btn btn-danger mt-auto">View Files</button>
-                <input class="btn btn-danger mb-2" type="submit" value="Form haha ambot">
+                <div class="d-flex gap-2 w-100 mt-auto">
+                    <button class="btn btn-danger flex-fill">View Files</button>
+                    <button class="btn btn-danger flex-fill" type="submit">Proceed</button>
+                </div>
             </div>
         </div>
 

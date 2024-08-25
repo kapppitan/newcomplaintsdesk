@@ -45,7 +45,7 @@
 
                     <li class="nav-item" role="presentation">
                         <button class="nav-link bg-danger text-light d-flex" id="btn-closed" data-bs-toggle="pill" data-bs-target="#tab-closed" type="button" role="tab" aria-controls="btn-closed" aria-selected="false">
-                            <i class="bi-file-earmark-check-fill me-2"></i>Closed
+                            <i class="bi-file-earmark-check-fill me-2"></i>Processing
                         </button>
                     </li>
 
@@ -89,8 +89,14 @@
                                     <small>{{ $complaint->created_at->diffForHumans() }}</small>
                                 </div>
 
-                                <p class="mb-1">{{ $complaint->details }}</p>
-                                <small class="text-secondary" style="font-size: 12px;">Submitted by: {{ $complaint->name }}</small>
+                                <p class="mb-2">{{ $complaint->details }}</p>
+                                <small class="text-secondary" style="font-size: 12px;">
+                                    <h6>
+                                        @if ($complaint->status === 0)
+                                            <span class="badge text-bg-primary rounded-pill">Pending</span>
+                                        @endif
+                                    </h6>
+                                </small>
                             </a>
                         @endforeach
                     </div>
@@ -110,30 +116,61 @@
                     <h5 class="text-secondary-emphasis">Account Management</h5>
                     <hr class="border-2">
 
-                    <form class="mb-5 w-50" method="post">
-                        @csrf
+                    <ul class="nav nav-tabs" role="tablist" id="settings">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link text-dark active" id="settings-account" data-bs-toggle="tab" data-bs-target="#tab-accounts" type="button" role="tab" aria-controls="settings-account" aria-selected="true">
+                                Create Account
+                            </button>
+                        </li>
 
-                        <div class="input-group mb-2">
-                            <span class="input-group-text w-25" id="name-wrap">Username</span>
-                            <input class="form-control" type="text" aria-describedby="name-wrap">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link text-dark" id="settings-offices" data-bs-toggle="tab" data-bs-target="#tab-offices" type="button" role="tab" aria-controls="settings-offices" aria-selected="false">
+                                Create Office
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content mb-5 p-3 bg-white border border-top-0 border-1" id="settings">
+                        <div class="tab-pane fade show active" id="tab-accounts" role="tabpanel" aria-labelledby="tab-accounts" tabindex="0">
+                            <form method="post">
+                                @csrf
+
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text w-25">Username</span>
+                                    <input class="form-control" type="text">
+                                </div>
+
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text w-25">Default Password</span>
+                                    <input class="form-control" type="text">
+                                </div>
+
+                                <div class="input-group mb-2">
+                                    <label class="input-group-text w-25" for="office">Office</label>
+                                    <select class="form-select" name="office">
+                                        @foreach ($offices as $office)
+                                            <option value="{{ $office->id }}">{{ $office->office_name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <input class="btn btn-danger" type="submit" value="Create Account">
+                            </form>
                         </div>
 
-                        <div class="input-group mb-2">
-                            <span class="input-group-text w-25" id="password-wrap">Password</span>
-                            <input class="form-control" type="text" aria-describedby="password-wrap">
-                        </div>
+                        <div class="tab-pane fade" id="tab-offices" role="tabpanel" aria-labelledby="tab-offices" tabindex="0">
+                            <form method="post">
+                                @csrf
 
-                        <div class="input-group mb-2">
-                            <label class="input-group-text w-25" for="office">Office</label>
-                            <select class="form-select" name="office">
-                                @foreach ($offices as $office)
-                                    <option value="{{ $office->id }}">{{ $office->office_name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                                <div class="input-group mb-2">
+                                    <span class="input-group-text w-25">Office Name</span>
+                                    <input class="form-control" type="text">
+                                </div>
 
-                        <input class="btn btn-danger" type="submit" value="Create Account">
-                    </form>
+                                <input class="btn btn-danger" type="submit" value="Create Office">
+                            </form>
+                        </div>
+                    </div>
 
                     <h5 class="text-secondary-emphasis">Accounts</h5>
                     <hr class="border-2">
