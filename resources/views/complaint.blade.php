@@ -21,12 +21,12 @@
                     <label class="form-label" for="details">Details</label>
                     <textarea class="form-control mb-2" rows="15" style="resize: none;" name="details" disabled>{{ $complaint->details }}</textarea>
                 
-                    <form class="input-group">
+                    <form class="input-group" method="post" action="/qao/update-status/{{ $complaint->id }}">
                         @csrf
                         <select class="form-select" name="status">
                             <option value="1">Legitimate</option>
-                            <option value="1">Illegitimate/Non-conforming</option>
-                            <option value="1">Inquiry</option>
+                            <option value="2">Illegitimate/Non-conforming</option>
+                            <option value="3">Inquiry</option>
                         </select>
 
                         <button class="btn btn-danger" type="submit">Update Status</button>

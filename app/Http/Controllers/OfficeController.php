@@ -38,13 +38,19 @@ class OfficeController extends Controller
         return redirect('/login');
     }
 
-    public function index (Request $request)
+    public function qao_index (Request $request)
     {
         $complaints = Complaints::all();
         $office = Office::with('users')->get();
-        $count = Complaints::where('status', 0)->get()->count();
+        $pending = Complaints::where('status', 0)->get()->count();
+        $processing = Complaints::where('status', 1)->get()->count();
 
-        return view('qao')->with(['complaints'=> $complaints, 'offices' => $office , 'pending' => $count]);
+        return view('qao')->with(['complaints'=> $complaints, 'offices' => $office , 'pending' => $pending, 'processing' => $processing]);
+    }
+
+    public function office_index (Request $request)
+    {
+        return view('office');
     }
 
     public function return (Request $request)

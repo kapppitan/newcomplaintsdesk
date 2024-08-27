@@ -47,4 +47,15 @@ class ComplaintController extends Controller
 
         return view('complaint')->with(['complaint' => $complaint, 'office' => $office]);
     }
+
+    public function update_status (Request $request, $id)
+    {
+        $complaint = Complaints::where('id', $id)->first();
+
+        $complaint->status = $request->status;
+
+        $complaint->save();
+
+        return redirect('/qao');
+    }
 }
