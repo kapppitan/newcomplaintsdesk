@@ -11,7 +11,7 @@
     </head>
 
     <body class="bg-light h-100 p-3">
-        <a href="{{ url()->previous() }}">Back</a>
+        <a href="/qao/complaint/return">Back</a>
         <hr class="border-2">
         <p>Submitted on {{ date('F j, Y', strtotime($complaint->created_at)) }} <span class="text-secondary">({{ $complaint->created_at->diffForHumans() }})</span></p>
 

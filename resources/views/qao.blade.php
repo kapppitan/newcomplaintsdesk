@@ -85,11 +85,33 @@
                         @foreach ($complaints as $complaint)
                             <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
                                 <div class="d-flex w-100 justify-content-between">
-                                    <h5 class="mb-1">{{ $complaint->complaint_type }}</h5>
-                                    <small>{{ $complaint->created_at->diffForHumans() }}</small>
+                                    <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 50, $end = "...") }}</h5>
+                                    <small class="text-secondary">{{ $complaint->created_at->diffForHumans() }}</small>
                                 </div>
 
-                                <p class="mb-2">{{ $complaint->details }}</p>
+                                <p class="mb-2">
+                                    @switch ($complaint->complaint_type)
+                                        @case(1)
+                                            Slow service
+                                            @break
+                                        @case(2)
+                                            Unruly/disrespectful personnel
+                                            @break
+                                        @case(3)
+                                            No response
+                                            @break
+                                        @case(4)
+                                            Error/s on request
+                                            @break
+                                        @case(5)
+                                            Delayed issuance of request
+                                            @break
+                                        @case(6)
+                                            Others (Specific issue)
+                                            @break
+                                    @endswitch
+                                </p>
+
                                 <small class="text-secondary" style="font-size: 12px;">
                                     <h6>
                                         @if ($complaint->status === 0)

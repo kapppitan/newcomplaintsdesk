@@ -49,7 +49,7 @@ class OfficeController extends Controller
 
     public function return (Request $request)
     {
-        return redirect()->back()->with('success-complaint', true);
+        return redirect('/qao')->with('success-complaint', true);
     }
 
     public function create_account (Request $request)
