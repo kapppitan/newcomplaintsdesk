@@ -21,7 +21,7 @@
         <title>Complaints Desk | QAO</title>
     </head>
 
-    <body class="bg-light vh-100 d-flex">
+    <body class="bg-light vh-100 d-flex overflow-hidden">
         <div class="row w-100 m-0">
             <div class="col-3 bg-danger p-3 d-flex flex-column">
                 <h3 class="text-light">title here</h3>
@@ -69,7 +69,7 @@
                 </button>
             </div>
 
-            <div class="col-9 tab-content p-3 h-100" id="tabContent">
+            <div class="col-9 tab-content p-3 h-100 overflow-scroll overflow-x-hidden" id="tabContent">
                 <div class="tab-pane fade flex-column show active" id="tab-overview" role="tabpanel" aria-labelledby="btn-overview" tabindex="0">
                     <h5 class="text-secondary-emphasis">Overview</h5>
                     <hr class="border-2">
@@ -113,7 +113,7 @@
                 </div>
                 
                 <div class="tab-pane fade flex-column" id="tab-management" role="tabpanel" aria-labelledby="btn-management" tabindex="0">
-                    <h5 class="text-secondary-emphasis">Account Management</h5>
+                    <h5 class="text-secondary-emphasis">Management</h5>
                     <hr class="border-2">
 
                     <ul class="nav nav-tabs" role="tablist" id="settings">
@@ -132,42 +132,42 @@
 
                     <div class="tab-content mb-5 p-3 bg-white border border-top-0 border-1" id="settings">
                         <div class="tab-pane fade show active" id="tab-accounts" role="tabpanel" aria-labelledby="tab-accounts" tabindex="0">
-                            <form method="post">
+                            <form class="flex-column d-flex" method="post" action="{{ route('create-account') }}" id="form-accounts">
                                 @csrf
 
                                 <div class="input-group mb-2">
                                     <span class="input-group-text w-25">Username</span>
-                                    <input class="form-control" type="text">
+                                    <input class="form-control" type="text" name="username" required>
                                 </div>
 
                                 <div class="input-group mb-2">
                                     <span class="input-group-text w-25">Default Password</span>
-                                    <input class="form-control" type="text">
+                                    <input class="form-control" type="text" name="password" required>
                                 </div>
 
                                 <div class="input-group mb-2">
-                                    <label class="input-group-text w-25" for="office">Office</label>
-                                    <select class="form-select" name="office">
+                                    <label class="input-group-text w-25">Office</label>
+                                    <select class="form-select" name="office" required>
                                         @foreach ($offices as $office)
                                             <option value="{{ $office->id }}">{{ $office->office_name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
 
-                                <input class="btn btn-danger" type="submit" value="Create Account">
+                                <button class="btn btn-danger ms-auto" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal">Create Account</button>
                             </form>
                         </div>
 
                         <div class="tab-pane fade" id="tab-offices" role="tabpanel" aria-labelledby="tab-offices" tabindex="0">
-                            <form method="post">
+                            <form class="flex-column d-flex" method="post" action="{{ route('create-office') }}" id="form-offices">
                                 @csrf
 
                                 <div class="input-group mb-2">
                                     <span class="input-group-text w-25">Office Name</span>
-                                    <input class="form-control" type="text">
+                                    <input class="form-control" type="text" name="office-name" required>
                                 </div>
 
-                                <input class="btn btn-danger" type="submit" value="Create Office">
+                                <button class="btn btn-danger ms-auto" type="button" data-bs-toggle="modal" data-bs-target="#confirmOffice">Create Office</button>
                             </form>
                         </div>
                     </div>
@@ -175,24 +175,72 @@
                     <h5 class="text-secondary-emphasis">Accounts</h5>
                     <hr class="border-2">
 
-                    <div class="accordion" id="office-list">
-                        @foreach ($offices as $office)
-                            <div class="accordion-item">
-                                <h2 class="accordion-header">
-                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#1" aria-expanded="false" aria-controls="1">
-                                        {{ $office->office_name }}
-                                    </button>
-                                </h2>
+                    <input class="form-control w-25 mb-2 ms-auto" type="search" id="office-search" placeholder="Search...">
 
-                                <div class="accordion-collapse collapse" data-bs-parent="#office-list" id="1">
-                                    <div class="accordion-body">
-                                        @foreach ($office->users as $user)
-                                            {{ $user->username }}
-                                        @endforeach
+                    <div class="list-group">
+                        <div class="accordion" id="office-list">
+                            @foreach ($offices as $office)
+                                <div class="accordion-item">
+                                    <h2 class="accordion-header">
+                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{{ $office->id }}" aria-expanded="false" aria-controls="1">
+                                            {{ $office->office_name }}
+                                        </button>
+                                    </h2>
+
+                                    <div class="accordion-collapse collapse" data-bs-parent="#office-list" id="{{ $office->id }}">
+                                        <div class="accordion-body d-flex flex-column gap-3">
+                                            @foreach ($office->users as $user)
+                                                <div class="d-flex align-items-center">
+                                                    <p class="mb-0 me-auto">{{ $user->username }}</p>
+                                                    <div class="d-flex gap-2">
+                                                        <button class="btn btn-primary">View</button>
+                                                        <button class="btn btn-danger">Delete</button>
+                                                    </div>
+                                                </div>
+                                            @endforeach
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        @endforeach
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="confirmModal" role="dialog" tabindex="-1" aria-labelledby="confirmModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5">Confirm?</h1>
+                    </div>
+
+                    <div class="modal-body">
+                        Are you sure you want to create the account?
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-primary" onclick="submitAccount()">Proceed</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="confirmOffice" role="dialog" tabindex="-1" aria-labelledby="confirmOffice" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5">Confirm?</h1>
+                    </div>
+
+                    <div class="modal-body">
+                        Are you sure you want to create office?
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-primary" onclick="submitOffice()">Proceed</button>
                     </div>
                 </div>
             </div>
@@ -202,6 +250,22 @@
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
         
+        @if (session("success-complaint"))
+            <script>
+                document.addEventListener("DOMContentLoaded", event => {
+                    document.getElementById('btn-pending').click();
+                });
+            </script>
+        @endif
+
+        @if (session("success-create"))
+            <script>
+                document.addEventListener("DOMContentLoaded", event => {
+                    document.getElementById('btn-management').click();
+                });
+            </script>
+        @endif
+
         <script>
             const triggerTablist = document.querySelectorAll('#nav button');
 
@@ -213,6 +277,16 @@
                     tabTrigger.show();
                 });
             });
+
+            function submitAccount()
+            {
+                document.getElementById('form-accounts').submit();
+            }
+
+            function submitOffice()
+            {
+                document.getElementById('form-offices').submit();
+            }
         </script>
     </body>
 </html>

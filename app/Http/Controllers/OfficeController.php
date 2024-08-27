@@ -46,4 +46,33 @@ class OfficeController extends Controller
 
         return view('qao')->with(['complaints'=> $complaints, 'offices' => $office , 'pending' => $count]);
     }
+
+    public function return (Request $request)
+    {
+        return redirect()->back()->with('success-complaint', true);
+    }
+
+    public function create_account (Request $request)
+    {
+        $account = new User();
+
+        $account->username = $request->input('username');
+        $account->password = $request->input('password');
+        $account->office_id = $request->input('office');
+
+        $account->save();
+
+        return redirect('/qao')->with('success-create', true);
+    }
+
+    public function create_office (Request $request)
+    {
+        $office = new Office();
+
+        $office->office_name = $request->input('office-name');
+
+        $office->save();
+
+        return redirect('/qao')->with('success-create', true);
+    }
 }
