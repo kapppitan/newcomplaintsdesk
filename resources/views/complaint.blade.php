@@ -27,6 +27,7 @@
                             <option value="1">Legitimate</option>
                             <option value="2">Illegitimate/Non-conforming</option>
                             <option value="3">Inquiry</option>
+                            <option value="4">Closed</option>
                         </select>
 
                         <button class="btn btn-danger" type="submit">Update Status</button>
@@ -58,7 +59,12 @@
 
                 <div class="d-flex gap-2 w-100 mt-auto">
                     <button class="btn btn-danger flex-fill">View Files</button>
-                    <button class="btn btn-danger flex-fill" type="submit">Proceed</button>
+                    
+                    @if ($complaint->status === 1)
+                        <a class="btn btn-danger flex-fill" href="/qao/complaint/form/{{ $complaint->id }}">Customer Complaint Form</a>
+                    @else
+                        <a class="btn btn-secondary flex-fill" href="#" disabled>Customer Complaint Form</a>
+                    @endif
                 </div>
             </div>
         </div>

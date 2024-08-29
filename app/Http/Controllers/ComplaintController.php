@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Complaints;
 use App\Models\Office;
+use App\Models\Ticket;
 
 class ComplaintController extends Controller
 {
@@ -52,10 +53,28 @@ class ComplaintController extends Controller
     {
         $complaint = Complaints::where('id', $id)->first();
 
+        if ($request->status == 1)
+        {
+            $ticket = new Ticket();
+            $ticketCount = Ticket::count();
+
+            $ticket->id = $ticketCount;
+            $ticket->complaint_id = $id;
+
+            $ticket->save();
+        }
+
         $complaint->status = $request->status;
 
         $complaint->save();
 
         return redirect('/qao');
+    }
+
+    public function form (Request $request, $id)
+    {
+        $complaint = Complaints::where('id', $id)->first();
+
+        return view('form')->with('complaint', $complaint);
     }
 }

@@ -39,7 +39,11 @@
                             <div class="me-auto">
                                 <i class="bi-inbox-fill me-2"></i>Pending
                             </div>
-                            <span class="badge">{{ $pending }}</span>
+                            <span class="badge">
+                                @if ($pending > 0)
+                                    {{ $pending }}
+                                @endif
+                            </span>
                         </button>
                     </li>
 
@@ -48,13 +52,17 @@
                             <div class="me-auto">    
                                 <i class="bi-file-earmark-check-fill me-2"></i>Processing
                             </div>
-                            <span class="badge">{{ $processing }}</span>
+                            <span class="badge">
+                                @if ($processing > 0)
+                                    {{ $processing }}
+                                @endif
+                            </span>
                         </button>
                     </li>
 
                     <li class="nav-item" role="presentation">
                         <button class="nav-link bg-danger text-light d-flex" id="btn-archived" data-bs-toggle="pill" data-bs-target="#tab-archived" type="button" role="tab" aria-controls="btn-archived" aria-selected="false">
-                            <i class="bi-archive-fill me-2"></i>Archived
+                            <i class="bi-archive-fill me-2"></i>Archive
                         </button>
                     </li>
 
@@ -86,7 +94,7 @@
 
                     <div class="list-group">
                         @foreach ($complaints as $complaint)
-                            @if ($complaint->status === 0)
+                            @if ($complaint->status === 0 or $complaint->status === 3)
                                 <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
                                     <div class="d-flex w-100 justify-content-between">
                                         <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 50, $end = "...") }}</h5>
@@ -122,8 +130,8 @@
                                                 @case(0)
                                                     <span class="badge text-bg-primary rounded-pill">Pending</span>
                                                     @break
-                                                @case(1)
-                                                    <span class="badge text-bg-success rounded-pill">Legitimate</span>
+                                                @case(3)
+                                                    <span class="badge text-bg-warning text-white rounded-pill">Inquiry</span>
                                                     @break
                                             @endswitch
                                         </h6>
@@ -142,10 +150,13 @@
 
                     <div class="list-group">
                         @foreach ($complaints as $complaint)
-                            @if ($complaint->status === 1 or $complaint->status === 3)
+                            @if ($complaint->status === 1)
                                 <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
                                     <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 50, $end = "...") }}</h5>
+                                        <h5 class="mb-1">
+                                            <span class="text-secondary">#1</span>
+                                            {{ \Illuminate\Support\Str::limit($complaint->details, 50, $end = "...") }}
+                                        </h5>
                                         <small class="text-secondary">{{ $complaint->created_at->diffForHumans() }}</small>
                                     </div>
 
@@ -180,10 +191,7 @@
                                                     @break
                                                 @case(1)
                                                     <span class="badge text-bg-success rounded-pill">Legitimate</span>
-                                                    @break
-                                                @case(3)
-                                                    <span class="badge text-bg-warning text-white rounded-pill">Inquiry</span>
-                                                    @break   
+                                                    @break 
                                             @endswitch
                                         </h6>
                                     </small>
@@ -198,6 +206,48 @@
                     <hr class="border-2">
 
                     <input class="form-control mb-2 w-25 ms-auto" type="search" name="search-archived" placeholder="Search...">
+
+                    <div class="list-group">
+                        @foreach ($complaints as $complaint)
+                            @if ($complaint->status === 4)
+                                <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 50, $end = "...") }}</h5>
+                                        <small class="text-secondary">Closed on {{ date('F j, Y', strtotime($complaint->updated_at)) }}</small>
+                                    </div>
+
+                                    <p class="mb-2">
+                                        @switch ($complaint->complaint_type)
+                                            @case(1)
+                                                Slow service
+                                                @break
+                                            @case(2)
+                                                Unruly/disrespectful personnel
+                                                @break
+                                            @case(3)
+                                                No response
+                                                @break
+                                            @case(4)
+                                                Error/s on request
+                                                @break
+                                            @case(5)
+                                                Delayed issuance of request
+                                                @break
+                                            @case(6)
+                                                Others (Specific issue)
+                                                @break
+                                        @endswitch
+                                    </p>
+
+                                    <small class="text-secondary" style="font-size: 12px;">
+                                        <h6>
+                                            <span class="badge text-bg-danger rounded-pill">Closed</span>
+                                        </h6>
+                                    </small>
+                                </a>
+                            @endif
+                        @endforeach
+                    </div>
                 </div>
                 
                 <div class="tab-pane fade flex-column" id="tab-management" role="tabpanel" aria-labelledby="btn-management" tabindex="0">

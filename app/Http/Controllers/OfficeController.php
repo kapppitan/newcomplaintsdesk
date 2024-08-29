@@ -22,6 +22,8 @@ class OfficeController extends Controller
 
             if($user->office_id == 1) {
                 return redirect('/qao');
+            } else {
+                return redirect('/office');
             }
         } else {
             return redirect('/login')->with('error', true);
