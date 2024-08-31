@@ -150,11 +150,11 @@
 
                     <div class="list-group">
                         @foreach ($complaints as $complaint)
-                            @if ($complaint->status === 1)
+                            @if ($complaint->status)
                                 <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
                                     <div class="d-flex w-100 justify-content-between">
                                         <h5 class="mb-1">
-                                            <span class="text-secondary">#1</span>
+                                            <span class="text-secondary">#{{ $complaint->ticket->ticket_number }}</span>
                                             {{ \Illuminate\Support\Str::limit($complaint->details, 50, $end = "...") }}
                                         </h5>
                                         <small class="text-secondary">{{ $complaint->created_at->diffForHumans() }}</small>
@@ -191,7 +191,10 @@
                                                     @break
                                                 @case(1)
                                                     <span class="badge text-bg-success rounded-pill">Legitimate</span>
-                                                    @break 
+                                                    @break
+                                                @case(3)
+                                                    <span class="badge text-bg-warning text-light rounded-pill">Inquiry</span>
+                                                    @break
                                             @endswitch
                                         </h6>
                                     </small>

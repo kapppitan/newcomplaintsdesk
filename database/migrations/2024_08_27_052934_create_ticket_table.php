@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('ticket', function (Blueprint $table) {
-            $table->integer('ticket_number')->primary();
+            $table->id();
+            $table->integer('ticket_number');
             $table->timestamps();
         });
     }

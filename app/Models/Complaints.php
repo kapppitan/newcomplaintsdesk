@@ -17,4 +17,9 @@ class Complaints extends Model
         'email',
         'phone',
     ];
+
+    public function ticket () 
+    {
+        return $this->belongsTo(Ticket::class);
+    }
 }

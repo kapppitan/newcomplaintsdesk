@@ -53,18 +53,17 @@ class ComplaintController extends Controller
     {
         $complaint = Complaints::where('id', $id)->first();
 
-        if ($request->status == 1)
+        $complaint->status = $request->status;
+
+        if ($request->status == 1 and $complaint->ticket_id == null)
         {
             $ticket = new Ticket();
-            $ticketCount = Ticket::count();
-
-            $ticket->id = $ticketCount;
-            $ticket->complaint_id = $id;
+            $ticket->ticket_number = Ticket::count() + 1;
 
             $ticket->save();
-        }
 
-        $complaint->status = $request->status;
+            $complaint->ticket_id = $ticket->id;
+        }
 
         $complaint->save();
 

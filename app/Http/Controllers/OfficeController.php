@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Complaints;
 use App\Models\Office;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -44,10 +45,11 @@ class OfficeController extends Controller
     {
         $complaints = Complaints::all();
         $office = Office::with('users')->get();
+        $ticket = Ticket::all();
         $pending = Complaints::where('status', 0)->get()->count();
-        $processing = Complaints::where('status', 1)->get()->count();
+        $processing = Complaints::whereIn('status', [1, 3, 4])->get()->count();
 
-        return view('qao')->with(['complaints'=> $complaints, 'offices' => $office , 'pending' => $pending, 'processing' => $processing]);
+        return view('qao')->with(['complaints'=> $complaints, 'offices' => $office , 'pending' => $pending, 'processing' => $processing, 'tickets' => $ticket]);
     }
 
     public function office_index (Request $request)
