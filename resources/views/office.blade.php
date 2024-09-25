@@ -24,7 +24,7 @@
     <body class="bg-light vh-100 d-flex overflow-hidden">
         <div class="row w-100 m-0">
             <div class="col-3 bg-danger p-0 d-flex flex-column">
-                <div class="p-3">
+                <div class="p-3 d-flex flex-column h-100">
                     <h3 class="text-light">Office Name</h3>
                     <hr class="border-light border-2">
 
@@ -56,6 +56,12 @@
                             </button>
                         </li>
                     </ul>
+
+                    <hr class="border-light border-2">
+
+                    <a class="btn btn-danger d-flex border-0 px-3 py-2" href="/logout">
+                        <i class="bi-box-arrow-left me-2"></i>Logout
+                    </a>
                 </div>
             </div>
 

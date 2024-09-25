@@ -24,7 +24,7 @@
     <body class="bg-light vh-100 d-flex overflow-hidden">
         <div class="row w-100 m-0">
             <div class="col-3 bg-danger p-3 d-flex flex-column">
-                <h3 class="text-light">title here</h3>
+                <h3 class="text-light">Complaints Desk</h3>
                 <hr class="border-light border-2">
 
                 <ul class="nav nav-pills nav-fill flex-column mb-auto gap-2" role="tablist" id="nav">
@@ -75,9 +75,9 @@
 
                 <hr class="border-light border-2">
 
-                <button class="btn btn-danger d-flex border-0 px-3 py-2">
+                <a class="btn btn-danger d-flex border-0 px-3 py-2" href="/logout">
                     <i class="bi-box-arrow-left me-2"></i>Logout
-                </button>
+                </a>
             </div>
 
             <div class="col-9 tab-content p-3 h-100 overflow-scroll overflow-x-hidden" id="tabContent">
@@ -90,9 +90,9 @@
                     <h5 class="text-secondary-emphasis">Pending Cases</h5>
                     <hr class="border-2">
 
-                    <input class="form-control mb-2 w-25 ms-auto" type="search" name="search" placeholder="Search...">
+                    <input class="form-control mb-2 w-25 ms-auto" type="search" name="search" placeholder="Search..." onkeyup="search_complaint(1)" id="search-pending">
 
-                    <div class="list-group">
+                    <div class="list-group" id="complaints-pending">
                         @foreach ($complaints as $complaint)
                             @if ($complaint->status === 0 or $complaint->status === 3)
                                 <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
@@ -146,9 +146,9 @@
                     <h5 class="text-secondary-emphasis">Processing Cases</h5>
                     <hr class="border-2">
 
-                    <input class="form-control mb-2 w-25 ms-auto" type="search" name="search-processing" placeholder="Search...">
+                    <input class="form-control mb-2 w-25 ms-auto" type="search" name="search-processing" placeholder="Search..." onkeyup="search_complaint(2)" id="search-processing">
 
-                    <div class="list-group">
+                    <div class="list-group" id="complaints-processing">
                         @foreach ($complaints as $complaint)
                             @if ($complaint->status)
                                 <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
@@ -208,9 +208,9 @@
                     <h5 class="text-secondary-emphasis">Archived Cases</h5>
                     <hr class="border-2">
 
-                    <input class="form-control mb-2 w-25 ms-auto" type="search" name="search-archived" placeholder="Search...">
+                    <input class="form-control mb-2 w-25 ms-auto" type="search" name="search-archived" placeholder="Search..." onkeyup="search_complaint(3)" id="search-archive">
 
-                    <div class="list-group">
+                    <div class="list-group" id="complaints-archive">
                         @foreach ($complaints as $complaint)
                             @if ($complaint->status === 4)
                                 <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
@@ -427,6 +427,61 @@
             function submitOffice()
             {
                 document.getElementById('form-offices').submit();
+            }
+
+            function search_complaint(mode) {
+                switch (mode) {
+                    case 1:
+                        var input = document.getElementById('search-pending');
+                        var filter = input.value.toUpperCase();
+                        var list = document.getElementById('complaints-pending').getElementsByTagName('a');
+
+                        for (var i = 0; i < list.length; i++) {
+                            var item = list[i];
+                            var content = item.textContent || item.innerText;
+
+                            if (content.toUpperCase().indexOf(filter) > -1) {
+                                list[i].style.display = "";
+                            } else {
+                                list[i].style.display = "none";
+                            }
+                        }
+                        break;
+                    case 2:
+                        var input = document.getElementById('search-processing');
+                        var filter = input.value.toUpperCase();
+                        var list = document.getElementById('complaints-processing').getElementsByTagName('a');
+
+                        for (var i = 0; i < list.length; i++) {
+                            var item = list[i];
+                            var content = item.textContent || item.innerText;
+
+                            if (content.toUpperCase().indexOf(filter) > -1) {
+                                list[i].style.display = "";
+                            } else {
+                                list[i].style.display = "none";
+                            }
+                        }
+                        break;
+                    case 3:
+                        var input = document.getElementById('search-archive');
+                        var filter = input.value.toUpperCase();
+                        var list = document.getElementById('complaints-archive').getElementsByTagName('a');
+
+                        for (var i = 0; i < list.length; i++) {
+                            var item = list[i];
+                            var content = item.textContent || item.innerText;
+
+                            if (content.toUpperCase().indexOf(filter) > -1) {
+                                list[i].style.display = "";
+                            } else {
+                                list[i].style.display = "none";
+                            }
+                        }
+                        break;
+                    default:
+                        break;
+                }  
             }
         </script>
     </body>

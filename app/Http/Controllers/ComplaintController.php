@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Models\Complaints;
 use App\Models\Office;
 use App\Models\Ticket;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class ComplaintController extends Controller
 {
@@ -73,7 +75,13 @@ class ComplaintController extends Controller
     public function form (Request $request, $id)
     {
         $complaint = Complaints::where('id', $id)->first();
+        $users = User::where('office_id', Auth::user()->office_id)->get();
 
-        return view('form')->with('complaint', $complaint);
+        return view('form')->with(['complaint' => $complaint, 'users' => $users]);
+    }
+
+    public function submite_ccf (Request $request, $id)
+    {
+        
     }
 }

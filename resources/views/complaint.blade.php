@@ -45,7 +45,18 @@
                     <label class="form-label" for="name">Complainant</label>
                     <div class="d-flex flex-column gap-2">
                         <input class="form-control" type="text" name="name" value="{{ $complaint->name }}" disabled>
-                        <input class="form-control" type="text" name="type" value="{{ $complaint->user_type }}" disabled>
+
+                        @switch ($complaint->user_type)
+                            @case(1)
+                                <input class="form-control" type="text" name="type" value="Student" disabled>
+                                @break
+                            @case(2)
+                                <input class="form-control" type="text" name="type" value="Alumni" disabled>
+                                @break
+                            @case(3)
+                                <input class="form-control" type="text" name="type" value="Staff" disabled>
+                                @break
+                        @endswitch
                     </div>
                 </div>
 
