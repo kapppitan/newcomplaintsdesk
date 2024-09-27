@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('complaintstable', function (Blueprint $table) {
-            //
+        Schema::table('complaints', function (Blueprint $table) {
+            $table->string('validated_by');
         });
     }
 
@@ -21,8 +21,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('complaintstable', function (Blueprint $table) {
-            //
-        });
+        
     }
 };
