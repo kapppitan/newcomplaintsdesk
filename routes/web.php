@@ -18,8 +18,9 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('qao', 'App\Http\Controllers\OfficeController@qao_index');
     Route::get('qao/complaint/return', 'App\Http\Controllers\OfficeController@return');
     Route::get('qao/complaint/{id}', 'App\Http\Controllers\ComplaintController@view');
-    Route::get('qao/complaint/form/{id}', 'App\Http\Controllers\ComplaintController@form');
+    Route::get('qao/complaint/form/{id}', 'App\Http\Controllers\ComplaintController@form_index');
     Route::get('/office', 'App\Http\Controllers\OfficeController@office_index');
+    Route::get('/qao/complaint/form/print/{id}', 'App\Http\Controllers\ComplaintController@print_ccf');
 });
 
 

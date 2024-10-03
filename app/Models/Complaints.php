@@ -18,6 +18,10 @@ class Complaints extends Model
         'phone',
     ];
 
+    protected $casts = [
+        'date_verified' => 'datetime',
+    ];
+
     public function ticket () 
     {
         return $this->belongsTo(Ticket::class);

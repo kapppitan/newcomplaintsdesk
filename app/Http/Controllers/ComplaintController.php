@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Form;
 use Illuminate\Http\Request;
 use App\Models\Complaints;
 use App\Models\Office;
 use App\Models\Ticket;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class ComplaintController extends Controller
@@ -65,6 +67,8 @@ class ComplaintController extends Controller
             $ticket->save();
 
             $complaint->ticket_id = $ticket->id;
+            $complaint->validated_by = Auth::user()->id;
+            $complaint->date_verified = Carbon::now();
         }
 
         $complaint->save();
@@ -72,16 +76,46 @@ class ComplaintController extends Controller
         return redirect('/qao');
     }
 
-    public function form (Request $request, $id)
+    public function form_index (Request $request, $id)
     {
         $complaint = Complaints::where('id', $id)->first();
         $users = User::where('office_id', Auth::user()->office_id)->get();
+        $auth = Auth::user();
 
-        return view('form')->with(['complaint' => $complaint, 'users' => $users]);
+        return view('form')->with(['complaint' => $complaint, 'users' => $users, 'auth' => $auth]);
     }
 
-    public function submite_ccf (Request $request, $id)
+    public function submit_ccf (Request $request, $id)
     {
-        
+        $form = new Form();
+
+        $form->immediate_action = $request->corrective;
+        $form->consequence = $request->consequence;
+        $form->root_case = $request->analysis;
+        $form->nonconformity = $request->similar;
+
+        $form->corrective_action = $request->actions;
+        $form->implementation = $request->implementation;
+        $form->measure = $request->effectiveness;
+        $form->period = $request->period;
+        $form->responsible = $request->responsible;
+
+        $form->risk_opportunity = $request->risk;
+        // $form->changes = $request;
+        $form->prepared_by = $request->prepared_by;
+        $form->prepared_on = $request->prepared_date;
+        $form->approved_by = $request->approved_on;
+        $form->approved_on = $request->approved_date;
+        $form->acknowledge_by = $request->acknowledged_by;
+        $form->acknowledge_on = $request->acknowledge_date;
+
+        $form->save();
+    }
+
+    public function print_ccf (Request $request, $id)
+    {
+        $complaint = Complaints::where('id', $id)->first();
+
+        return view('complaintprint')->with('complaint', $complaint);
     }
 }
