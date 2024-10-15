@@ -84,6 +84,11 @@
                 <div class="tab-pane fade flex-column show active" id="tab-overview" role="tabpanel" aria-labelledby="btn-overview" tabindex="0">
                     <h5 class="text-secondary-emphasis">Overview</h5>
                     <hr class="border-2">
+
+                    <select class="form-select" name="filter" id="filter">
+                        <option value="0" selected disabled>Filter</option>
+                        <option value="1">By Year</option>
+                    </select>
                 </div>
                 
                 <div class="tab-pane fade flex-column" id="tab-pending" role="tabpanel" aria-labelledby="btn-peding" tabindex="0">
@@ -93,52 +98,62 @@
                     <input class="form-control mb-2 w-25 ms-auto" type="search" name="search" placeholder="Search..." onkeyup="search_complaint(1)" id="search-pending">
 
                     <div class="list-group" id="complaints-pending">
-                        @foreach ($complaints as $complaint)
-                            @if ($complaint->status === 0 or $complaint->status === 3)
-                                <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 50, $end = "...") }}</h5>
-                                        <small class="text-secondary">{{ $complaint->created_at->diffForHumans() }}</small>
-                                    </div>
+                        @php
+                            $pendingComplaints = $complaints->filter(function($complaint) {
+                                return $complaint->status == 0 || $complaint->status == 3;
+                            });
+                        @endphp
 
-                                    <p class="mb-2">
-                                        @switch ($complaint->complaint_type)
-                                            @case(1)
-                                                Slow service
-                                                @break
-                                            @case(2)
-                                                Unruly/disrespectful personnel
-                                                @break
-                                            @case(3)
-                                                No response
-                                                @break
-                                            @case(4)
-                                                Error/s on request
-                                                @break
-                                            @case(5)
-                                                Delayed issuance of request
-                                                @break
-                                            @case(6)
-                                                Others (Specific issue)
-                                                @break
-                                        @endswitch
-                                    </p>
+                        @if ($pendingComplaints->isEmpty())
+                            <p class="text-center text-secondary m-0">No pending complaints!</p>
+                        @else
+                            @foreach ($complaints as $complaint)
+                                @if ($complaint->status === 0 or $complaint->status === 3)
+                                    <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 50, $end = "...") }}</h5>
+                                            <small class="text-secondary">{{ $complaint->created_at->diffForHumans() }}</small>
+                                        </div>
 
-                                    <small class="text-secondary" style="font-size: 12px;">
-                                        <h6>
-                                            @switch ($complaint->status)
-                                                @case(0)
-                                                    <span class="badge text-bg-primary rounded-pill">Pending</span>
+                                        <p class="mb-2">
+                                            @switch ($complaint->complaint_type)
+                                                @case(1)
+                                                    Slow service
+                                                    @break
+                                                @case(2)
+                                                    Unruly/disrespectful personnel
                                                     @break
                                                 @case(3)
-                                                    <span class="badge text-bg-warning text-white rounded-pill">Inquiry</span>
+                                                    No response
+                                                    @break
+                                                @case(4)
+                                                    Error/s on request
+                                                    @break
+                                                @case(5)
+                                                    Delayed issuance of request
+                                                    @break
+                                                @case(6)
+                                                    Others (Specific issue)
                                                     @break
                                             @endswitch
-                                        </h6>
-                                    </small>
-                                </a>
-                            @endif
-                        @endforeach
+                                        </p>
+
+                                        <small class="text-secondary" style="font-size: 12px;">
+                                            <h6>
+                                                @switch ($complaint->status)
+                                                    @case(0)
+                                                        <span class="badge text-bg-primary rounded-pill">Pending</span>
+                                                        @break
+                                                    @case(3)
+                                                        <span class="badge text-bg-warning text-white rounded-pill">Inquiry</span>
+                                                        @break
+                                                @endswitch
+                                            </h6>
+                                        </small>
+                                    </a>
+                                @endif
+                            @endforeach
+                        @endif
                     </div>
                 </div>
                 
@@ -149,58 +164,68 @@
                     <input class="form-control mb-2 w-25 ms-auto" type="search" name="search-processing" placeholder="Search..." onkeyup="search_complaint(2)" id="search-processing">
 
                     <div class="list-group" id="complaints-processing">
-                        @foreach ($complaints as $complaint)
-                            @if ($complaint->status)
-                                <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="mb-1">
-                                            <span class="text-secondary">#{{ $complaint->ticket->ticket_number }}</span>
-                                            {{ \Illuminate\Support\Str::limit($complaint->details, 50, $end = "...") }}
-                                        </h5>
-                                        <small class="text-secondary">{{ $complaint->created_at->diffForHumans() }}</small>
-                                    </div>
+                        @php
+                            $processingComplaints = $complaints->filter(function($complaint) {
+                                return $complaint->status;
+                            });
+                        @endphp
 
-                                    <p class="mb-2">
-                                        @switch ($complaint->complaint_type)
-                                            @case(1)
-                                                Slow service
-                                                @break
-                                            @case(2)
-                                                Unruly/disrespectful personnel
-                                                @break
-                                            @case(3)
-                                                No response
-                                                @break
-                                            @case(4)
-                                                Error/s on request
-                                                @break
-                                            @case(5)
-                                                Delayed issuance of request
-                                                @break
-                                            @case(6)
-                                                Others (Specific issue)
-                                                @break
-                                        @endswitch
-                                    </p>
+                        @if ($processingComplaints->isEmpty())
+                            <p class="text-center text-secondary m-0">No processed complaints!</p>
+                        @else
+                            @foreach ($complaints as $complaint)
+                                @if ($complaint->status)
+                                    <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h5 class="mb-1">
+                                                <span class="text-secondary">#{{ $complaint->ticket->ticket_number }}</span>
+                                                {{ \Illuminate\Support\Str::limit($complaint->details, 50, $end = "...") }}
+                                            </h5>
+                                            <small class="text-secondary">{{ $complaint->created_at->diffForHumans() }}</small>
+                                        </div>
 
-                                    <small class="text-secondary" style="font-size: 12px;">
-                                        <h6>
-                                            @switch ($complaint->status)
-                                                @case(0)
-                                                    <span class="badge text-bg-primary rounded-pill">Pending</span>
-                                                    @break
+                                        <p class="mb-2">
+                                            @switch ($complaint->complaint_type)
                                                 @case(1)
-                                                    <span class="badge text-bg-success rounded-pill">Legitimate</span>
+                                                    Slow service
+                                                    @break
+                                                @case(2)
+                                                    Unruly/disrespectful personnel
                                                     @break
                                                 @case(3)
-                                                    <span class="badge text-bg-warning text-light rounded-pill">Inquiry</span>
+                                                    No response
+                                                    @break
+                                                @case(4)
+                                                    Error/s on request
+                                                    @break
+                                                @case(5)
+                                                    Delayed issuance of request
+                                                    @break
+                                                @case(6)
+                                                    Others (Specific issue)
                                                     @break
                                             @endswitch
-                                        </h6>
-                                    </small>
-                                </a>
-                            @endif
-                        @endforeach
+                                        </p>
+
+                                        <small class="text-secondary" style="font-size: 12px;">
+                                            <h6>
+                                                @switch ($complaint->status)
+                                                    @case(0)
+                                                        <span class="badge text-bg-primary rounded-pill">Pending</span>
+                                                        @break
+                                                    @case(1)
+                                                        <span class="badge text-bg-success rounded-pill">Legitimate</span>
+                                                        @break
+                                                    @case(3)
+                                                        <span class="badge text-bg-warning text-light rounded-pill">Inquiry</span>
+                                                        @break
+                                                @endswitch
+                                            </h6>
+                                        </small>
+                                    </a>
+                                @endif
+                            @endforeach
+                        @endif
                     </div>
                 </div>
                 
@@ -334,7 +359,7 @@
                                                 <div class="d-flex align-items-center">
                                                     <p class="mb-0 me-auto">{{ $user->username }}</p>
                                                     <div class="d-flex gap-2">
-                                                        <button class="btn btn-primary">View</button>
+                                                        <button class="btn btn-primary" onclick="viewUser()">View</button>
                                                         <button class="btn btn-danger">Delete</button>
                                                     </div>
                                                 </div>
@@ -386,6 +411,38 @@
                 </div>
             </div>
         </div>
+
+        <div class="modal fade" id="viewUser" role="dialog" tabindex="-1" aria-labelledby="viewUser" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5">Username</h1>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-medium">Office:</span>
+                            <p>Office Name</p>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-medium">Created at:</span>
+                            <p>Created on</p>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-medium">Last logged out:</span>
+                            <p>Last logged on</p>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Delete</button>
+                        <button class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div
 
         <script src="{{ asset('js/jquery-3.7.1.min.js') }}"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
@@ -482,6 +539,12 @@
                     default:
                         break;
                 }  
+            }
+
+            function viewUser() {
+                var modal = new bootstrap.Modal(document.getElementById("viewUser"));
+
+                modal.show();
             }
         </script>
     </body>

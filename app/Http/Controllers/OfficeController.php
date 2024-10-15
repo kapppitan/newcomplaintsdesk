@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Complaints;
 use App\Models\Office;
 use App\Models\Ticket;
+use App\Models\Form;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -48,13 +49,17 @@ class OfficeController extends Controller
         $ticket = Ticket::all();
         $pending = Complaints::where('status', 0)->get()->count();
         $processing = Complaints::whereIn('status', [1, 3, 4])->get()->count();
+        $forms = Form::all();
 
-        return view('qao')->with(['complaints'=> $complaints, 'offices' => $office , 'pending' => $pending, 'processing' => $processing, 'tickets' => $ticket]);
+        return view('qao')->with(['complaints'=> $complaints, 'offices' => $office , 'pending' => $pending, 'processing' => $processing, 'tickets' => $ticket, 'form' => $forms]);
     }
 
     public function office_index (Request $request)
     {
-        return view('office');
+        $complaints = Complaints::where('office_id', Auth::user()->office_id)->get();
+        $office = Office::where('id', Auth::user()->office_id)->first();
+
+        return view('office')->with(['complaints' => $complaints, 'office' => $office]);
     }
 
     public function return (Request $request)
@@ -84,5 +89,10 @@ class OfficeController extends Controller
         $office->save();
 
         return redirect('/qao')->with('success-create', true);
+    }
+
+    public function view_memo (Request $request)
+    {
+        return view('memo');
     }
 }

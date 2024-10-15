@@ -13,7 +13,7 @@
 
     <body class="bg-secondary px-5 pt-0 pb-5 d-flex flex-column align-items-center">
         <div class="d-flex p-3 w-100 justify-content-between align-items-center">
-            <a href="/qao/complaint/{{ $complaint->id }}" class="btn btn-primary">Back</a>
+            <a href="{{ url()->previous() }}" class="btn btn-primary">Back</a>
             <button class="btn btn-danger">Print</button>
         </div>
 

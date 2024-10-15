@@ -13,12 +13,16 @@
 
     <body class="bg-light h-100 p-3">
         <div class="d-flex gap-2 align-items-center justify-content-between">
-            <a href="/qao/complaint/{{ $complaint->id }}">Back</a>
-            <h4 class="text-danger">Customer Complaint Form</h4>
+            <a href="{{ url()->previous() }}">Back</a>
+            <h4 class="text-danger position-absolute start-50 translate-middle-x" style="top: 15px;">Customer Complaint Form</h4>
             <div class="d-flex gap-2">
                 <a class="btn btn-secondary" href="/qao/complaint/form/print/{{ $complaint->id }}">
                     <i class="bi bi-printer"></i>
                 </a>
+
+                @if ($auth->office_id != 1)
+                    <button class="btn btn-primary" onclick="">View Memo</button>
+                @endif
 
                 @if ($auth->office_id == 1)
                     <button class="btn btn-danger" onclick="confirm_form()">Forward Form</button>
@@ -40,11 +44,11 @@
             </li>
 
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="qao-btn" data-bs-toggle="tab" data-bs-target="#qao-tab" type="button" role="tab" aria-controls="qao-tab" aria-selected="false">QAO</button>
+                <button class="nav-link" id="qao-btn" data-bs-toggle="tab" data-bs-target="#qao-tab" type="button" role="tab" aria-controls="qao-tab" aria-selected="false" {{ $auth->office_id != 1 ? 'disabled' : '' }}>QAO</button>
             </li>
         </nav>
 
-        <form class="tab-content bg-white" action="/submit-form" id="formContent">
+        <form class="tab-content bg-white" action="{{ route('submit-ccf', ['id' => $complaint->id]) }}" method="post" id="formContent">
             @csrf
 
             <!-- Complaint -->
@@ -53,7 +57,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label class="form-label" for="details">Description of complaint</label>
-                            <textarea class="form-control" style="resize: none;" name="details" rows="15">{{ $complaint->details }}</textarea>
+                            <textarea class="form-control" style="resize: none;" name="details" id="details" rows="15" {{ $auth->office_id != 1 ? 'disabled' : '' }}>{{ $complaint->details }}</textarea>
                         </div>
                     </div>
 
@@ -61,15 +65,15 @@
                         <div class="d-flex flex-column gap-1">
                             <span>Filed By</span>
                             <div class="input-group">
-                                <input class="form-control w-25" type="text" aria-label="complainant-name" value="{{ $complaint->name }}">
-                                <input class="form-control" type="date" aria-label="complainant-date" value="{{ $complaint->created_at->format('Y-m-d') }}">
+                                <input class="form-control w-25" type="text" aria-label="complainant-name" value="{{ $complaint->name }}" {{ $auth->office_id != 1 ? 'disabled' : '' }}>
+                                <input class="form-control" type="date" aria-label="complainant-date" value="{{ $complaint->created_at->format('Y-m-d') }}" {{ $auth->office_id != 1 ? 'disabled' : '' }}>
                             </div>
                         </div>
 
                         <div class="d-flex flex-column gap-1">
                             <span>Validated By</span>
                             <div class="input-group">
-                                <select class="form-select w-25">
+                                <select class="form-select w-25" {{ $auth->office_id != 1 ? 'disabled' : '' }}>
                                     @foreach ($users as $user)
                                         <option value="{{ $user->id }}" {{ $user->id == $complaint->validated_by ? 'selected' : '' }}>
                                             {{ $user->username }}
@@ -77,14 +81,14 @@
                                     @endforeach
                                 </select>
 
-                                <input class="form-control" type="date" aria-label="validated-date" value="{{ $complaint->date_verified->format('Y-m-d') }}">
+                                <input class="form-control" type="date" aria-label="validated-date" value="{{ $complaint->date_verified->format('Y-m-d') }}" {{ $auth->office_id != 1 ? 'disabled' : '' }}>
                             </div>
                         </div>
 
                         <div class="d-flex flex-column gap-1">
                             <span>Acknowledged By</span>
                             <div class="input-group">
-                                <select class="form-select w-25">
+                                <select class="form-select w-25" {{ $auth->office_id != 1 ? 'disabled' : '' }}>
                                     @foreach ($users as $user)
                                         <option value="{{ $user->id }}" {{ $user->id == $complaint->validated_by ? 'selected' : '' }}>
                                             {{ $user->username }}
@@ -92,7 +96,7 @@
                                     @endforeach
                                 </select>
                                  
-                                <input class="form-control" type="date" aria-label="acknowledge-date" value="">
+                                <input class="form-control" type="date" aria-label="acknowledge-date" value="" {{ $auth->office_id != 1 ? 'disabled' : '' }}>
                             </div>
                         </div>
                     </div>
@@ -104,81 +108,81 @@
                 <div class="d-flex flex-column gap-3 align-items-center">
                     <div class="d-flex flex-column w-75 gap-1 mt-3">
                         <label class="form-label" for="corrective">Actions to be taken control/correct issues of the complaint</label>
-                        <textarea class="form-control" style="resize: none;" rows="5" name="corrective" id="corrective"></textarea>
+                        <textarea class="form-control" style="resize: none;" rows="5" name="corrective" id="corrective" {{ $auth->office_id == 1 ? 'disabled' : '' }}></textarea>
                     </div>
 
                     <div class="d-flex flex-column w-75 gap-1">
                         <label class="form-label" for="consequence">Actions taken to deal with the consequence of the complaint</label>
-                        <textarea class="form-control" style="resize: none;" rows="5" name="consequence" id="consequence"></textarea>
+                        <textarea class="form-control" style="resize: none;" rows="5" name="consequence" id="consequence" {{ $auth->office_id == 1 ? 'disabled' : '' }}></textarea>
                     </div>
 
                     <div class="d-flex flex-column w-75 gap-1">
                         <label class="form-label" for="analysis">Attack detailed analysis like 5 Whys, Tree Diagram, etc. if applicable</label>
-                        <textarea class="form-control" style="resize: none;" rows="5" name="analysis" id="analysis"></textarea>
+                        <textarea class="form-control" style="resize: none;" rows="5" name="analysis" id="analysis" {{ $auth->office_id == 1 ? 'disabled' : '' }}></textarea>
                     </div>
 
                     <div class="d-flex flex-column w-75 gap-1">
                         <label class="form-label" for="similar">Specify the location and process where similar issues may occur</label>
-                        <textarea class="form-control" style="resize: none;" rows="5" name="similar" id="similar"></textarea>
+                        <textarea class="form-control" style="resize: none;" rows="5" name="similar" id="similar" {{ $auth->office_id == 1 ? 'disabled' : '' }}></textarea>
                     </div>
 
                     <div class="row mt-3 w-75">
                         <div class="col-md-7 form-group">
                             <label class="form-label" for="actions">Corrective Actions</label>
-                            <textarea class="form-control" style="resize: none;" name="actions" rows="13" id="actions"></textarea>
+                            <textarea class="form-control" style="resize: none;" name="actions" rows="13" id="actions" {{ $auth->office_id == 1 ? 'disabled' : '' }}></textarea>
                         </div>
 
                         <div class="col-md-5 d-flex gap-2 flex-column">
                             <div class="d-flex flex-column form-group">
                                 <label class="form-label" for="implementation">Implementation Date</label>
-                                <input class="form-control" type="date" name="implementation" id="implementation">
+                                <input class="form-control" type="date" name="implementation" id="implementation" {{ $auth->office_id == 1 ? 'disabled' : '' }}>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label" for="effectiveness">Measure of Effectiveness</label>
-                                <textarea class="form-control" style="resize: none;" rows="3" name="effectiveness" id="effectiveness"></textarea>
+                                <textarea class="form-control" style="resize: none;" rows="3" name="effectiveness" id="effectiveness" {{ $auth->office_id == 1 ? 'disabled' : '' }}></textarea>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label" for="period">Monitoring Period for CA</label>
-                                <input class="form-control" type="text" name="period" id="period">
+                                <input class="form-control" type="text" name="period" id="period" {{ $auth->office_id == 1 ? 'disabled' : '' }}>
                             </div>
 
                             <div class="form-group">
                                 <label class="form-label" for="responsible">Responsible</label>
-                                <input class="form-control" type="text" name="responsible" id="responsible">
+                                <input class="form-control" type="text" name="responsible" id="responsible" {{ $auth->office_id == 1 ? 'disabled' : '' }}>
                             </div>
                         </div>
 
                         <div class="d-flex mt-5 gap-4">
                             <div class="form-group w-50">
                                 <label class="form-label" for="risk">Related Risks/Opportunities</label>
-                                <textarea class="form-control" style="resize: none;" rows="5" name="risk" id="risk"></textarea>
+                                <textarea class="form-control" style="resize: none;" rows="5" name="risk" id="risk" {{ $auth->office_id == 1 ? 'disabled' : '' }}></textarea>
                             </div>
 
                             <div class="form-group w-50">
-                                <label class="form-label" for="changes">Changes need to Quality Management System</label>
-                                <textarea class="form-control" style="resize: none;" rows="5" name="changes" id="changes"></textarea>
+                                <label class="form-label" for="changes">Changes needed to Quality Management System</label>
+                                <textarea class="form-control" style="resize: none;" rows="5" name="changes" id="changes" {{ $auth->office_id == 1 ? 'disabled' : '' }}></textarea>
                             </div>
                         </div>
 
                         <div class="d-flex flex-column gap-2 mt-5">
                             <div class="input-group">
                                 <span class="input-group-text w-25">Prepared By</span>
-                                <input type="text" aria-label="prepared-by-name" class="form-control" name="prepared-by">
-                                <input type="date" aria-label="prepared-by-date" class="form-control" name="prepared-date">
+                                <input type="text" aria-label="prepared-by-name" class="form-control" name="prepared-by" {{ $auth->office_id == 1 ? 'disabled' : '' }}>
+                                <input type="date" aria-label="prepared-by-date" class="form-control" name="prepared-date" {{ $auth->office_id == 1 ? 'disabled' : '' }}>
                             </div>
 
                             <div class="input-group">
                                 <span class="input-group-text w-25">Approved By</span>
-                                <input type="text" aria-label="approved-by-name" class="form-control" name="approved-by">
-                                <input type="date" aria-label="approved-by-date" class="form-control" name="approved-date">
+                                <input type="text" aria-label="approved-by-name" class="form-control" name="approved-by" {{ $auth->office_id == 1 ? 'disabled' : '' }}>
+                                <input type="date" aria-label="approved-by-date" class="form-control" name="approved-date" {{ $auth->office_id == 1 ? 'disabled' : '' }}>
                             </div>
 
                             <div class="input-group">
                                 <span class="input-group-text w-25">Acknowledged By</span>
-                                <input type="text" aria-label="acknowledge-by-name" class="form-control" name="acknowledge-by">
-                                <input type="date" aria-label="acknowledge-by-date" class="form-control" name="acknowledge-date">
+                                <input type="text" aria-label="acknowledge-by-name" class="form-control" name="acknowledge-by" {{ $auth->office_id == 1 ? 'disabled' : '' }}>
+                                <input type="date" aria-label="acknowledge-by-date" class="form-control" name="acknowledge-date" {{ $auth->office_id == 1 ? 'disabled' : '' }}>
                             </div>
                         </div>
                     </div>
@@ -192,11 +196,11 @@
 
                     <div class="d-flex gap-2">
                         <div class="col-md-7 d-flex flex-column gap-2">
-                            <textarea class="form-control" rows="10" name="customer-feedback" style="resize: none;"></textarea>
+                            <textarea class="form-control" rows="10" name="customer-feedback" id="customer-feedback" style="resize: none;"></textarea>
 
                             <div class="form-group">
                                 <label class="form-label" for="report">Reported By</label>
-                                <input class="form-control" type="text" name="report">
+                                <input class="form-control" type="text" name="report" id="report">
                             </div>
                         </div>
                         
@@ -240,7 +244,7 @@
 
                     <div class="modal-footer">
                         <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button class="btn btn-danger" onclick="">Submit</button>
+                        <button class="btn btn-danger" onclick="submit_form()">Submit</button>
                     </div>
                 </div>
             </div>
@@ -274,7 +278,7 @@
             }
 
             function submit_form() {
-
+                document.getElementById('formContent').submit();
             }
         </script>
     </body>

@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
             'username' => 'User1',
             'password' => Hash::make('123'),
             'office_id' => 1,
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
     }
 }

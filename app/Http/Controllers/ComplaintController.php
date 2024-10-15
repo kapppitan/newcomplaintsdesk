@@ -81,17 +81,21 @@ class ComplaintController extends Controller
         $complaint = Complaints::where('id', $id)->first();
         $users = User::where('office_id', Auth::user()->office_id)->get();
         $auth = Auth::user();
+        $form = Form::where('complaint_id', $id)->first();
 
-        return view('form')->with(['complaint' => $complaint, 'users' => $users, 'auth' => $auth]);
+        return view('form')->with(['complaint' => $complaint, 'users' => $users, 'auth' => $auth, 'form' => $form]);
     }
 
     public function submit_ccf (Request $request, $id)
     {
-        $form = new Form();
+        $form = Form::firstOrNew(['complaint_id' => $id]);
+
+        $form->complaint_id = $id;
+        $form->complaint_phase += 1;
 
         $form->immediate_action = $request->corrective;
         $form->consequence = $request->consequence;
-        $form->root_case = $request->analysis;
+        $form->root_cause = $request->analysis;
         $form->nonconformity = $request->similar;
 
         $form->corrective_action = $request->actions;
@@ -101,15 +105,16 @@ class ComplaintController extends Controller
         $form->responsible = $request->responsible;
 
         $form->risk_opportunity = $request->risk;
-        // $form->changes = $request;
         $form->prepared_by = $request->prepared_by;
         $form->prepared_on = $request->prepared_date;
         $form->approved_by = $request->approved_on;
         $form->approved_on = $request->approved_date;
-        $form->acknowledge_by = $request->acknowledged_by;
-        $form->acknowledge_on = $request->acknowledge_date;
+        $form->acknowledged_by = $request->acknowledged_by;
+        $form->acknowledged_on = $request->acknowledge_date;
 
         $form->save();
+
+        return redirect('/qao/complaint/form/{$id}');
     }
 
     public function print_ccf (Request $request, $id)

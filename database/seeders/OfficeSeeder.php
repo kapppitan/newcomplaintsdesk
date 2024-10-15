@@ -13,8 +13,10 @@ class OfficeSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('office')->insert([
+        DB::table('offices')->insert([
             'office_name' => 'Office 1',
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
     }
 }

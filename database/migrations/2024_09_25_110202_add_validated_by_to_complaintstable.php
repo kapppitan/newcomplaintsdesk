@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('complaints', function (Blueprint $table) {
-            $table->string('validated_by');
+            $table->foreignId('validated_by')->nullable()->constrained()->references('id')->on('users')->onDelete('cascade');
         });
     }
 
