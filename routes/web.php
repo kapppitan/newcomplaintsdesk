@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Route;
 
 
@@ -14,6 +16,22 @@ Route::get('/login', function () {
 
 Route::get('/logout', 'App\Http\Controllers\OfficeController@logout');
 
+Route::get('evidence/{filename}', function ($filename) {
+    $path = storage_path('app/evidence' . $filename);
+
+    if (!File::exists($path)) {
+        abort(404);
+    }
+
+    $file = File::get($path);
+    $type = File::mimeType($path);
+
+    $response = Response::make($file, 200);
+    $response->header("Content-Type", $type);
+
+    return $response;
+}); 
+
 Route::group(['middleware' => 'auth'], function() {
     Route::get('qao', 'App\Http\Controllers\OfficeController@qao_index');
     Route::get('qao/complaint/return', 'App\Http\Controllers\OfficeController@return');
@@ -22,6 +40,7 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('/qao/complaint/form/print/{id}', 'App\Http\Controllers\ComplaintController@print_ccf');
     Route::get('/office', 'App\Http\Controllers\OfficeController@office_index');
     Route::get('/office/memo/{id}', 'App\Http\Controllers\OfficeController@view_memo');
+    Route::get('/user/{id}', 'App\Http\Controllers\OfficeController@get_user');
 });
 
 

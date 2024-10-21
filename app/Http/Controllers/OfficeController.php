@@ -48,7 +48,7 @@ class OfficeController extends Controller
         $office = Office::with('users')->get();
         $ticket = Ticket::all();
         $pending = Complaints::where('status', 0)->get()->count();
-        $processing = Complaints::whereIn('status', [1, 3, 4])->get()->count();
+        $processing = Complaints::whereIn('status', [1, 3])->get()->count();
         $forms = Form::all();
 
         return view('qao')->with(['complaints'=> $complaints, 'offices' => $office , 'pending' => $pending, 'processing' => $processing, 'tickets' => $ticket, 'form' => $forms]);
@@ -94,5 +94,16 @@ class OfficeController extends Controller
     public function view_memo (Request $request)
     {
         return view('memo');
+    }
+
+    public function get_user ($id)
+    {
+        $user = User::find($id);
+        $office = Office::find($user->office_id);
+
+        return response()->json([
+            'user' => $user,
+            'office' => $office,
+        ]);
     }
 }

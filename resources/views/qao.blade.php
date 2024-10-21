@@ -8,6 +8,8 @@
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+        <script src="{{ asset('js/jquery-3.7.1.min.js') }}"></script>
+
         <style>
             #nav button.active {
                 filter: brightness(90%);
@@ -85,17 +87,23 @@
                     <h5 class="text-secondary-emphasis">Overview</h5>
                     <hr class="border-2">
 
-                    <select class="form-select" name="filter" id="filter">
+                    <select class="form-select mb-2 w-25 ms-auto" name="filter" id="filter">
                         <option value="0" selected disabled>Filter</option>
                         <option value="1">By Year</option>
                     </select>
+
+                    <div class="btn-danger h-100">
+                        This is a test
+                    </div>
                 </div>
                 
                 <div class="tab-pane fade flex-column" id="tab-pending" role="tabpanel" aria-labelledby="btn-peding" tabindex="0">
-                    <h5 class="text-secondary-emphasis">Pending Cases</h5>
+                    <div class="d-flex">
+                        <h5 class="text-secondary-emphasis">Pending Cases</h5>
+                        <input class="form-control w-25 ms-auto" type="search" name="search" placeholder="Search..." onkeyup="search_complaint(1)" id="search-pending">
+                    </div>
+                    
                     <hr class="border-2">
-
-                    <input class="form-control mb-2 w-25 ms-auto" type="search" name="search" placeholder="Search..." onkeyup="search_complaint(1)" id="search-pending">
 
                     <div class="list-group" id="complaints-pending">
                         @php
@@ -158,15 +166,17 @@
                 </div>
                 
                 <div class="tab-pane fade flex-column" id="tab-closed" role="tabpanel" aria-labelledby="btn-closed" tabindex="0">
-                    <h5 class="text-secondary-emphasis">Processing Cases</h5>
+                    <div class="d-flex">
+                        <h5 class="text-secondary-emphasis">Processing Cases</h5>
+                        <input class="form-control w-25 ms-auto" type="search" name="search-processing" placeholder="Search..." onkeyup="search_complaint(2)" id="search-processing">
+                    </div>
+    
                     <hr class="border-2">
-
-                    <input class="form-control mb-2 w-25 ms-auto" type="search" name="search-processing" placeholder="Search..." onkeyup="search_complaint(2)" id="search-processing">
 
                     <div class="list-group" id="complaints-processing">
                         @php
                             $processingComplaints = $complaints->filter(function($complaint) {
-                                return $complaint->status;
+                                return ($complaint->status > 0 && $complaint->status < 4);
                             });
                         @endphp
 
@@ -174,7 +184,7 @@
                             <p class="text-center text-secondary m-0">No processed complaints!</p>
                         @else
                             @foreach ($complaints as $complaint)
-                                @if ($complaint->status)
+                                @if ($complaint->status > 0 && $complaint->status < 4)
                                     <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
                                         <div class="d-flex w-100 justify-content-between">
                                             <h5 class="mb-1">
@@ -230,10 +240,12 @@
                 </div>
                 
                 <div class="tab-pane fade flex-column" id="tab-archived" role="tabpanel" aria-labelledby="btn-archived" tabindex="0">
-                    <h5 class="text-secondary-emphasis">Archived Cases</h5>
-                    <hr class="border-2">
+                    <div class="d-flex">
+                        <h5 class="text-secondary-emphasis">Archived Cases</h5>
+                        <input class="form-control w-25 ms-auto" type="search" name="search-archived" placeholder="Search..." onkeyup="search_complaint(3)" id="search-archive">
+                    </div>
 
-                    <input class="form-control mb-2 w-25 ms-auto" type="search" name="search-archived" placeholder="Search..." onkeyup="search_complaint(3)" id="search-archive">
+                    <hr class="border-2">
 
                     <div class="list-group" id="complaints-archive">
                         @foreach ($complaints as $complaint)
@@ -338,10 +350,12 @@
                         </div>
                     </div>
 
-                    <h5 class="text-secondary-emphasis">Accounts</h5>
-                    <hr class="border-2">
+                    <div class="d-flex">
+                        <h5 class="text-secondary-emphasis">Accounts</h5>
+                        <input class="form-control w-25 ms-auto" type="search" id="office-search" placeholder="Search...">
+                    </div>
 
-                    <input class="form-control w-25 mb-2 ms-auto" type="search" id="office-search" placeholder="Search...">
+                    <hr class="border-2">
 
                     <div class="list-group">
                         <div class="accordion" id="office-list">
@@ -355,14 +369,18 @@
 
                                     <div class="accordion-collapse collapse" data-bs-parent="#office-list" id="{{ $office->id }}">
                                         <div class="accordion-body d-flex flex-column gap-3">
-                                            @foreach ($office->users as $user)
+                                            @foreach ($office->users as $index => $user)
                                                 <div class="d-flex align-items-center">
                                                     <p class="mb-0 me-auto">{{ $user->username }}</p>
                                                     <div class="d-flex gap-2">
-                                                        <button class="btn btn-primary" onclick="viewUser()">View</button>
+                                                        <button class="btn btn-primary view-user-btn" onclick="viewUser()" data-id="{{ $user->id }}">View</button>
                                                         <button class="btn btn-danger">Delete</button>
                                                     </div>
                                                 </div>
+
+                                                @if ($index !== $loop->count - 1)
+                                                    <hr class="m-0">
+                                                @endif
                                             @endforeach
                                         </div>
                                     </div>
@@ -416,23 +434,23 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5">Username</h1>
+                        <h1 class="modal-title fs-5" id="userModalName">Username</h1>
                     </div>
 
                     <div class="modal-body">
                         <div class="d-flex justify-content-between">
                             <span class="fw-medium">Office:</span>
-                            <p>Office Name</p>
+                            <p id="userOfficeName"></p>
                         </div>
 
                         <div class="d-flex justify-content-between">
                             <span class="fw-medium">Created at:</span>
-                            <p>Created on</p>
+                            <p id="userCreatedOn"></p>
                         </div>
 
                         <div class="d-flex justify-content-between">
-                            <span class="fw-medium">Last logged out:</span>
-                            <p>Last logged on</p>
+                            <span class="fw-medium">Last logged on:</span>
+                            <p id="userLoggedOn"></p>
                         </div>
                     </div>
 
@@ -444,7 +462,6 @@
             </div>
         </div
 
-        <script src="{{ asset('js/jquery-3.7.1.min.js') }}"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
         
@@ -546,6 +563,37 @@
 
                 modal.show();
             }
+
+            $('.view-user-btn').on('click', function () {
+                var userId = $(this).data('id');
+
+                $.ajax({
+                    url: '/user/' + userId,
+                    method: 'GET',
+                    success: function(data) {
+                        let createdDate = new Date(data.user.created_at);
+                        let formattedCreatedDate = createdDate.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                        });
+
+                        let loggedDate = new Date(data.user.updated_at);
+                        let formattedLoggedDate = loggedDate.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                        });
+
+                        $('#userModalName').text(data.user.username);
+                        $('#userOfficeName').text(data.office.office_name);
+                        $('#userCreatedOn').text(formattedCreatedDate);
+                        $('#userLoggedOn').text(formattedLoggedDate);
+
+                        $('#userModal').modal('show');
+                    }
+                });
+            });
         </script>
     </body>
 </html>

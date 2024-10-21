@@ -69,7 +69,7 @@
                 </div>
 
                 <div class="d-flex gap-2 w-100 mt-auto">
-                    <button class="btn btn-danger flex-fill">View Files</button>
+                    <button class="btn btn-danger flex-fill" onclick="showFiles()">View Files</button>
                     
                     @if ($complaint->status === 1)
                         <a class="btn btn-danger flex-fill" href="/qao/complaint/form/{{ $complaint->id }}">Customer Complaint Form</a>
@@ -80,8 +80,33 @@
             </div>
         </div>
 
+        <div class="modal fade" id="filesModal" tabindex="-1" aria-labelledby="filesModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="filesModalLabel">Attached File</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <img src="{{ Storage::url($complaint->image_path) }}" style="width: 100%;">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <script src="{{ asset('js/jquery-3.7.1.min.js') }}"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+    
+        <script>
+            function showFiles() {
+                $('#filesModal').modal('show');
+            }
+        </script>
     </body>
 </html>

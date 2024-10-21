@@ -10,6 +10,7 @@ use App\Models\Ticket;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ComplaintController extends Controller
 {
@@ -35,7 +36,7 @@ class ComplaintController extends Controller
         $complaint->email = $request->input('email');
         $complaint->phone = $request->input('phone');
 
-        $file = $request->file('file')->store('evidence');
+        $file = $request->file('file')->store('evidence', 'public');
         $complaint->image_path = $file;
 
         $complaint->office_id = $request->input('recipient');
