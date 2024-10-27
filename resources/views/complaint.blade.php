@@ -25,7 +25,7 @@
                         @csrf
                         <select class="form-select" name="status">
                             <option value="1">Legitimate</option>
-                            <option value="2">Illegitimate/Non-conforming</option>
+                            <option value="2">Non-conforming</option>
                             <option value="3">Inquiry</option>
                             <option value="4">Closed</option>
                         </select>
@@ -68,14 +68,18 @@
                     </div>
                 </div>
 
-                <div class="d-flex gap-2 w-100 mt-auto">
+                <div class="d-flex flex-column gap-2 w-100 mt-auto">
                     <button class="btn btn-danger flex-fill" onclick="showFiles()">View Files</button>
                     
-                    @if ($complaint->status === 1)
-                        <a class="btn btn-danger flex-fill" href="/qao/complaint/form/{{ $complaint->id }}">Customer Complaint Form</a>
-                    @else
-                        <a class="btn btn-secondary flex-fill" href="#" disabled>Customer Complaint Form</a>
-                    @endif
+                    <div class="d-flex gap-2">
+                        @if ($complaint->status === 1)
+                            <a class="btn btn-danger flex-fill" href="/qao/complaint/memo/{{ $complaint->id }}">Memo</a>
+                            <a class="btn btn-danger flex-fill" href="/qao/complaint/form/{{ $complaint->id }}">Customer Complaint Form</a>
+                        @else
+                            <a class="btn btn-danger flex-fill" href="#" disabled>Memo</a>
+                            <a class="btn btn-secondary flex-fill" href="#" disabled>Customer Complaint Form</a>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>

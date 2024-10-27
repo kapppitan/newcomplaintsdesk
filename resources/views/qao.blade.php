@@ -153,7 +153,7 @@
                                                         <span class="badge text-bg-primary rounded-pill">Pending</span>
                                                         @break
                                                     @case(3)
-                                                        <span class="badge text-bg-warning text-white rounded-pill">Inquiry</span>
+                                                        <span class="badge text-bg-info text-white rounded-pill">Inquiry</span>
                                                         @break
                                                 @endswitch
                                             </h6>
@@ -175,16 +175,16 @@
 
                     <div class="list-group" id="complaints-processing">
                         @php
-                            $processingComplaints = $complaints->filter(function($complaint) {
-                                return ($complaint->status > 0 && $complaint->status < 4);
+                            $processingComplaints = $tcomplaints->filter(function($complaint) {
+                                return ($complaint->status > 0 && $complaint->status < 4 && $complaint->status != 2);
                             });
                         @endphp
 
                         @if ($processingComplaints->isEmpty())
                             <p class="text-center text-secondary m-0">No processed complaints!</p>
                         @else
-                            @foreach ($complaints as $complaint)
-                                @if ($complaint->status > 0 && $complaint->status < 4)
+                            @foreach ($tcomplaints as $complaint)
+                                @if ($complaint->status > 0 && $complaint->status < 3)
                                     <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
                                         <div class="d-flex w-100 justify-content-between">
                                             <h5 class="mb-1">
@@ -227,7 +227,19 @@
                                                         <span class="badge text-bg-success rounded-pill">Legitimate</span>
                                                         @break
                                                     @case(3)
-                                                        <span class="badge text-bg-warning text-light rounded-pill">Inquiry</span>
+                                                        <span class="badge text-bg-info text-white rounded-pill">Inquiry</span>
+                                                        @break
+                                                @endswitch
+
+                                                @switch ($complaint->phase)
+                                                    @case(1)
+                                                        <span class="badge text-bg-warning text-white rounded-pill">Delivered</span>
+                                                        @break
+                                                    @case(2)
+                                                        <span class="badge text-bg-danger rounded-pill">Returned</span>
+                                                        @break
+                                                    @case(3)
+                                                        <span class="badge text-bg-info rounded-pill">Submitted</span>
                                                         @break
                                                 @endswitch
                                             </h6>
@@ -248,45 +260,55 @@
                     <hr class="border-2">
 
                     <div class="list-group" id="complaints-archive">
-                        @foreach ($complaints as $complaint)
-                            @if ($complaint->status === 4)
-                                <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 50, $end = "...") }}</h5>
-                                        <small class="text-secondary">Closed on {{ date('F j, Y', strtotime($complaint->updated_at)) }}</small>
-                                    </div>
+                        @php
+                            $archivedComplaints = $complaints->filter(function($complaint) {
+                                return ($complaint->status == 4);
+                            });
+                        @endphp
 
-                                    <p class="mb-2">
-                                        @switch ($complaint->complaint_type)
-                                            @case(1)
-                                                Slow service
-                                                @break
-                                            @case(2)
-                                                Unruly/disrespectful personnel
-                                                @break
-                                            @case(3)
-                                                No response
-                                                @break
-                                            @case(4)
-                                                Error/s on request
-                                                @break
-                                            @case(5)
-                                                Delayed issuance of request
-                                                @break
-                                            @case(6)
-                                                Others (Specific issue)
-                                                @break
-                                        @endswitch
-                                    </p>
+                        @if ($archivedComplaints->isEmpty())
+                            <p class="text-center text-secondary m-0">No archived complaints!</p>
+                        @else
+                            @foreach ($complaints as $complaint)
+                                @if ($complaint->status === 4)
+                                    <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 50, $end = "...") }}</h5>
+                                            <small class="text-secondary">Closed on {{ date('F j, Y', strtotime($complaint->updated_at)) }}</small>
+                                        </div>
 
-                                    <small class="text-secondary" style="font-size: 12px;">
-                                        <h6>
-                                            <span class="badge text-bg-danger rounded-pill">Closed</span>
-                                        </h6>
-                                    </small>
-                                </a>
-                            @endif
-                        @endforeach
+                                        <p class="mb-2">
+                                            @switch ($complaint->complaint_type)
+                                                @case(1)
+                                                    Slow service
+                                                    @break
+                                                @case(2)
+                                                    Unruly/disrespectful personnel
+                                                    @break
+                                                @case(3)
+                                                    No response
+                                                    @break
+                                                @case(4)
+                                                    Error/s on request
+                                                    @break
+                                                @case(5)
+                                                    Delayed issuance of request
+                                                    @break
+                                                @case(6)
+                                                    Others (Specific issue)
+                                                    @break
+                                            @endswitch
+                                        </p>
+
+                                        <small class="text-secondary" style="font-size: 12px;">
+                                            <h6>
+                                                <span class="badge text-bg-danger rounded-pill">Closed</span>
+                                            </h6>
+                                        </small>
+                                    </a>
+                                @endif
+                            @endforeach
+                        @endif
                     </div>
                 </div>
                 
@@ -352,7 +374,6 @@
 
                     <div class="d-flex">
                         <h5 class="text-secondary-emphasis">Accounts</h5>
-                        <input class="form-control w-25 ms-auto" type="search" id="office-search" placeholder="Search...">
                     </div>
 
                     <hr class="border-2">
@@ -460,7 +481,25 @@
                     </div>
                 </div>
             </div>
-        </div
+        </div>
+
+        <div class="modal fade" id="notifications" role="dialog" tabindex="-1" aria-labelledby="notifications" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="userModalName">Notification</h1>
+                    </div>
+
+                    <div class="modal-body">
+                        There are n new complaints!
+                    </div>
+
+                    <div cs="modal-footer">
+                        <button class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>

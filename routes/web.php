@@ -33,13 +33,18 @@ Route::get('evidence/{filename}', function ($filename) {
 }); 
 
 Route::group(['middleware' => 'auth'], function() {
-    Route::get('qao', 'App\Http\Controllers\OfficeController@qao_index');
-    Route::get('qao/complaint/return', 'App\Http\Controllers\OfficeController@return');
-    Route::get('qao/complaint/{id}', 'App\Http\Controllers\ComplaintController@view');
-    Route::get('qao/complaint/form/{id}', 'App\Http\Controllers\ComplaintController@form_index');
+    Route::get('/qmso', 'App\Http\Controllers\OfficeController@qao_index');
+    Route::get('/qao', 'App\Http\Controllers\OfficeController@qao_index');
+    Route::get('/qao/complaint/return', 'App\Http\Controllers\OfficeController@return');
+    Route::get('/qao/complaint/{id}', 'App\Http\Controllers\ComplaintController@view');
+    Route::get('/qao/complaint/form/{id}', 'App\Http\Controllers\ComplaintController@form_index');
     Route::get('/qao/complaint/form/print/{id}', 'App\Http\Controllers\ComplaintController@print_ccf');
+    Route::get('/qao/complaint/memo/{id}', 'App\Http\Controllers\OfficeController@memo_index');
+    Route::get('/qao/complaint/memo/print/{id}', 'App\Http\Controllers\ComplaintController@print_memo');
     Route::get('/office', 'App\Http\Controllers\OfficeController@office_index');
-    Route::get('/office/memo/{id}', 'App\Http\Controllers\OfficeController@view_memo');
+    Route::get('/office/complaint/memo/{id}', 'App\Http\Controllers\OfficeController@view_memo');
+    Route::get('/office/complaint/form/{id}', 'App\Http\Controllers\ComplaintController@form_index');
+    Route::get('/office/complaint/memo/print/{id}', 'App\Http\Controllers\ComplaintController@print_memo');
     Route::get('/user/{id}', 'App\Http\Controllers\OfficeController@get_user');
 });
 
@@ -55,3 +60,4 @@ Route::post('/create-office', 'App\Http\Controllers\OfficeController@create_offi
 
 Route::post('qao/update-status/{id}', 'App\Http\Controllers\ComplaintController@update_status')->name('update-status');
 Route::post('qao/submite-ccf/{id}', 'App\Http\Controllers\ComplaintController@submit_ccf')->name('submit-ccf');
+Route::post('qao/submite-memo/{id}', 'App\Http\Controllers\ComplaintController@submit_memo')->name('submit-memo');

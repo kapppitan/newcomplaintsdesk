@@ -44,22 +44,27 @@ class OfficeController extends Controller
 
     public function qao_index (Request $request)
     {
-        $complaints = Complaints::all();
-        $office = Office::with('users')->get();
-        $ticket = Ticket::all();
-        $pending = Complaints::where('status', 0)->get()->count();
-        $processing = Complaints::whereIn('status', [1, 3])->get()->count();
-        $forms = Form::all();
+        if (Auth::user()->office_id == 1) {
+            $complaints = Complaints::all();
+            $tcomplaints = Complaints::orderBy('ticket_id')->get();
+            $office = Office::with('users')->get();
+            $ticket = Ticket::all();
+            $pending = Complaints::where('status', 0)->get()->count();
+            $processing = Complaints::whereIn('status', [1, 3])->get()->count();
+            $forms = Form::all();
 
-        return view('qao')->with(['complaints'=> $complaints, 'offices' => $office , 'pending' => $pending, 'processing' => $processing, 'tickets' => $ticket, 'form' => $forms]);
+            return view('qao')->with(['complaints'=> $complaints, 'offices' => $office , 'pending' => $pending, 'processing' => $processing, 'tickets' => $ticket, 'form' => $forms, 'tcomplaints' => $tcomplaints]);
+        }
     }
 
     public function office_index (Request $request)
     {
-        $complaints = Complaints::where('office_id', Auth::user()->office_id)->get();
-        $office = Office::where('id', Auth::user()->office_id)->first();
+        if(Auth::user()->office_id != 1) {
+            $complaints = Complaints::where('office_id', Auth::user()->office_id)->where('has_form', true)->get();
+            $office = Office::where('id', Auth::user()->office_id)->first();
 
-        return view('office')->with(['complaints' => $complaints, 'office' => $office]);
+            return view('office')->with(['complaints' => $complaints, 'office' => $office]);
+        }
     }
 
     public function return (Request $request)
@@ -91,9 +96,11 @@ class OfficeController extends Controller
         return redirect('/qao')->with('success-create', true);
     }
 
-    public function view_memo (Request $request)
+    public function memo_index (Request $request, $id)
     {
-        return view('memo');
+        $complaint = Complaints::where('id', $id)->first();
+
+        return view('memo')->with('complaint', $complaint);
     }
 
     public function get_user ($id)
