@@ -11,10 +11,10 @@
     </head>
 
     <body class="bg-danger w-100 vh-100 justify-content-center align-items-center d-flex">
-        <form method="post" action="{{ route('login') }}" class="bg-light d-flex flex-column gap-2 p-3 pt-5 rounded-3" style="height: fit-content;">
+        <form method="post" action="{{ route('login') }}" class="bg-light d-flex flex-column gap-2 p-5 rounded-3 shadow" style="height: fit-content;">
             @csrf
 
-            <h2 class="text-center text-danger mb-5">WMSU Complaints Desk</h2>
+            <h2 class="text-center text-danger mb-5">WMSU<br>Complaints Desk</h2>
 
             @if(session('error'))
                 <div class="alert alert-danger alert-dismissible fade show fs-6 py-1" role="alert">

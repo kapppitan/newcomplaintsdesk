@@ -52,6 +52,9 @@ class ComplaintController extends Controller
         $complaint = Complaints::where('id', $id)->first();
         $office = Office::where('id', $complaint->office_id)->first();
 
+        $complaint->is_read = true;
+        $complaint->save();
+
         return view('complaint')->with(['complaint' => $complaint, 'office' => $office]);
     }
 

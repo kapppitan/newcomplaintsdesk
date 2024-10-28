@@ -53,7 +53,15 @@ class OfficeController extends Controller
             $processing = Complaints::whereIn('status', [1, 3])->get()->count();
             $forms = Form::all();
 
-            return view('qao')->with(['complaints'=> $complaints, 'offices' => $office , 'pending' => $pending, 'processing' => $processing, 'tickets' => $ticket, 'form' => $forms, 'tcomplaints' => $tcomplaints]);
+            $new_complaints = Complaints::where('is_read', false)->where('created_at', '>', Auth::user()->last_activity)->get();
+
+            $user = User::where('id', Auth::user()->id)->first();
+            $user->last_activity = Carbon::now();
+            $user->save();
+
+            return view('qao')->with(['complaints'=> $complaints, 'offices' => $office , 'pending' => $pending, 'processing' => $processing, 'tickets' => $ticket, 'form' => $forms, 'tcomplaints' => $tcomplaints, 'new_complaints' => $new_complaints]);
+        } else {
+            return $this->office_index($request);
         }
     }
 
@@ -64,6 +72,8 @@ class OfficeController extends Controller
             $office = Office::where('id', Auth::user()->office_id)->first();
 
             return view('office')->with(['complaints' => $complaints, 'office' => $office]);
+        } elseif (Auth::user()->office_id == 1) {
+            return $this->qao_index($request);
         }
     }
 

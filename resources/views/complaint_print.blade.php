@@ -81,7 +81,7 @@
 
                 <div class="col border p-0 ps-1">
                     <p class="m-0 fw-bold border-bottom" style="font-size: x-small;">Date</p>
-                    <p class="m-0" style="font-size: x-small;">{{ Carbon\Carbon::parse($complaint->validated_on)->format('Y-m-d') }}</p>
+                    <p class="m-0" style="font-size: x-small;">{{ Carbon\Carbon::parse($complaint->validated_on)->format('M y') }}</p>
                 </div>
 
                 <div class="col border p-0 ps-1">

@@ -76,7 +76,7 @@
                             <a class="btn btn-danger flex-fill" href="/qao/complaint/memo/{{ $complaint->id }}">Memo</a>
                             <a class="btn btn-danger flex-fill" href="/qao/complaint/form/{{ $complaint->id }}">Customer Complaint Form</a>
                         @else
-                            <a class="btn btn-danger flex-fill" href="#" disabled>Memo</a>
+                            <a class="btn btn-secondary flex-fill" href="#" disabled>Memo</a>
                             <a class="btn btn-secondary flex-fill" href="#" disabled>Customer Complaint Form</a>
                         @endif
                     </div>

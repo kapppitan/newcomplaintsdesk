@@ -48,6 +48,7 @@
                     <option value="1">Student</option>
                     <option value="2">Alumni</option>
                     <option value="3">Staff</option>
+                    <option value="4">Others</option>
                 </select>
             </div>
 

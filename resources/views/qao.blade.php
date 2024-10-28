@@ -26,7 +26,11 @@
     <body class="bg-light vh-100 d-flex overflow-hidden">
         <div class="row w-100 m-0">
             <div class="col-3 bg-danger p-3 d-flex flex-column">
-                <h3 class="text-light">Complaints Desk</h3>
+                <div class="d-flex align-items-center gap-3">
+                    <img src="{{ asset('image/logo.png') }}" style="object-fit: fill; height: 50px; width: 50px;">
+                    <h4 class="text-light m-0">Complaints Desk</h4>
+                </div>
+                
                 <hr class="border-light border-2">
 
                 <ul class="nav nav-pills nav-fill flex-column mb-auto gap-2" role="tablist" id="nav">
@@ -59,6 +63,12 @@
                                     {{ $processing }}
                                 @endif
                             </span>
+                        </button>
+                    </li>
+
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link bg-danger text-light d-flex" id="btn-non" data-bs-toggle="pill" data-bs-target="#tab-non" type="button" role="tab" aria-controls="btn-non" aria-selected="false">
+                            <i class="bi-envelope-slash-fill me-2"></i>Non-Conforming
                         </button>
                     </li>
 
@@ -119,7 +129,7 @@
                                 @if ($complaint->status === 0 or $complaint->status === 3)
                                     <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
                                         <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 50, $end = "...") }}</h5>
+                                            <h5 class="mb-1 {{ $complaint->is_read == true ? 'text-secondary' : '' }}">{{ \Illuminate\Support\Str::limit($complaint->details, 50, $end = "...") }}</h5>
                                             <small class="text-secondary">{{ $complaint->created_at->diffForHumans() }}</small>
                                         </div>
 
@@ -491,10 +501,10 @@
                     </div>
 
                     <div class="modal-body">
-                        There are n new complaints!
+                        There are <span class="fw-bold">{{ $new_complaints->count() }}</span> new complaints!
                     </div>
 
-                    <div cs="modal-footer">
+                    <div class="modal-footer">
                         <button class="btn btn-danger" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
@@ -634,5 +644,14 @@
                 });
             });
         </script>
+
+        @if($new_complaints)
+            <script>
+                document.addEventListener('DOMContentLoaded', event => {
+                    var modal = new bootstrap.Modal(document.getElementById("notifications"));
+                    modal.show();
+                });
+            </script>
+        @endif
     </body>
 </html>
