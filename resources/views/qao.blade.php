@@ -25,10 +25,10 @@
 
     <body class="bg-light vh-100 d-flex overflow-hidden">
         <div class="row w-100 m-0">
-            <div class="col-3 bg-danger p-3 d-flex flex-column">
-                <div class="d-flex align-items-center gap-3">
+            <div class="col-2 bg-danger p-3 d-flex flex-column">
+                <div class="d-flex align-items-center gap-2">
                     <img src="{{ asset('image/logo.png') }}" style="object-fit: fill; height: 50px; width: 50px;">
-                    <h4 class="text-light m-0">Complaints Desk</h4>
+                    <h4 class="text-light m-0 fs-5">Complaints Desk</h4>
                 </div>
                 
                 <hr class="border-light border-2">
@@ -67,12 +67,6 @@
                     </li>
 
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link bg-danger text-light d-flex" id="btn-non" data-bs-toggle="pill" data-bs-target="#tab-non" type="button" role="tab" aria-controls="btn-non" aria-selected="false">
-                            <i class="bi-envelope-slash-fill me-2"></i>Non-Conforming
-                        </button>
-                    </li>
-
-                    <li class="nav-item" role="presentation">
                         <button class="nav-link bg-danger text-light d-flex" id="btn-archived" data-bs-toggle="pill" data-bs-target="#tab-archived" type="button" role="tab" aria-controls="btn-archived" aria-selected="false">
                             <i class="bi-archive-fill me-2"></i>Archive
                         </button>
@@ -81,6 +75,12 @@
                     <li class="nav-item" role="presentation">
                         <button class="nav-link bg-danger text-light d-flex" id="btn-management" data-bs-toggle="pill" data-bs-target="#tab-management" type="button" role="tab" aria-controls="btn-management" aria-selected="false">
                             <i class="bi-person-lines-fill me-2"></i>Management
+                        </button>
+                    </li>
+
+                    <li class="nav-item visually-hidden" role="presentation">
+                        <button class="nav-link bg-danger text-light d-flex" id="btn-complaint" data-bs-toggle="pill" data-bs-target="#tab-complaint" type="button" role="tab" aria-controls="btn-complaint" aria-selected="false">
+                            <i class="bi-person-lines-fill me-2"></i>Complaint
                         </button>
                     </li>
                 </ul>
@@ -92,19 +92,9 @@
                 </a>
             </div>
 
-            <div class="col-9 tab-content p-3 h-100 overflow-scroll overflow-x-hidden" id="tabContent">
+            <div class="col-10 tab-content p-3 h-100 overflow-scroll overflow-x-hidden" id="tabContent">
                 <div class="tab-pane fade flex-column show active" id="tab-overview" role="tabpanel" aria-labelledby="btn-overview" tabindex="0">
-                    <h5 class="text-secondary-emphasis">Overview</h5>
-                    <hr class="border-2">
-
-                    <select class="form-select mb-2 w-25 ms-auto" name="filter" id="filter">
-                        <option value="0" selected disabled>Filter</option>
-                        <option value="1">By Year</option>
-                    </select>
-
-                    <div class="btn-danger h-100">
-                        This is a test
-                    </div>
+                    
                 </div>
                 
                 <div class="tab-pane fade flex-column" id="tab-pending" role="tabpanel" aria-labelledby="btn-peding" tabindex="0">
@@ -127,7 +117,7 @@
                         @else
                             @foreach ($complaints as $complaint)
                                 @if ($complaint->status === 0 or $complaint->status === 3)
-                                    <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
+                                    <a href="complaint/{{ $complaint->id }}" class="list-group-item complaint-link" data-toggle="tab" aria-current="true" data-id="{{ $complaint->id }}">
                                         <div class="d-flex w-100 justify-content-between">
                                             <h5 class="mb-1 {{ $complaint->is_read == true ? 'text-secondary' : '' }}">{{ \Illuminate\Support\Str::limit($complaint->details, 50, $end = "...") }}</h5>
                                             <small class="text-secondary">{{ $complaint->created_at->diffForHumans() }}</small>
@@ -183,7 +173,7 @@
     
                     <hr class="border-2">
 
-                    <div class="list-group" id="complaints-processing">
+                    <div class="list-group h-100" id="complaints-processing">
                         @php
                             $processingComplaints = $tcomplaints->filter(function($complaint) {
                                 return ($complaint->status > 0 && $complaint->status < 4 && $complaint->status != 2);
@@ -388,7 +378,7 @@
 
                     <hr class="border-2">
 
-                    <div class="list-group">
+                    <div class="list-group mb-5">
                         <div class="accordion" id="office-list">
                             @foreach ($offices as $office)
                                 <div class="accordion-item">
@@ -418,6 +408,102 @@
                                 </div>
                             @endforeach
                         </div>
+                    </div>
+
+                    <div class="d-flex">
+                        <h5 class="text-secondary-emphasis">Activity Log</h5>
+                    </div>
+
+                    <hr class="border-2">
+
+                    <div>
+                        pass
+                    </div>
+                </div>
+
+                <div class="tab-pane flex-column" id="tab-complaint" role="tabpanel" aria-labelledby="btn-complaint" tabindex="0">
+                    <a href="">Back</a>
+
+                    <hr class="border-2">
+
+                    <div class="d-flex gap-2">
+                        <p>Submitted on <span class="fw-bold" id="csub"></span></p>
+                        <span class="text-secondary" id="cago"></span>
+                    </div>
+
+                    <div class="row h-100">
+                        <div class="col-sm-7">
+                            <div class="form-group">
+                                <label class="form-label" for="details">Details</label>
+                                <textarea class="form-control mb-2" name="cdetails" id="cdetails" rows="21" style="resize: none;" disabled></textarea>
+                            
+                                <form class="input-group" method="post" action="" id="complaint-form">
+                                    @csrf
+
+                                    <select class="form-select rounded-start" name="status" id="status">
+                                        <option value="1">Legitimate</option>
+                                        <option value="2">Non-conformity</option>
+                                        <option value="3">Inquiry</option>
+                                        <option value="4">Closed</option>
+                                    </select>
+
+                                    <button class="btn btn-danger" type="submit">Update Status</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-5 d-flex flex-column gap-2">
+                            <div class="form-group">
+                                <label class="form-label" for="office">Recipient</label>
+                                <input class="form-control" type="text" name="coffice" id="coffice" disabled>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" for="">Complainant</label>
+
+                                <div class="d-flex flex-column gap-2">
+                                    <input class="form-control" type="text" name="cname" id="cname" disabled>
+                                    <input class="form-control" type="text" name="type" id="ctype" disabled>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="contact">Contact Information</label>
+
+                                <div class="d-flex flex-column gap-2">
+                                    <input class="form-control" type="email" name="cemail" id="cemail" disabled>
+                                    <input class="form-control" type="text" name="cnumber" id="cnumber" disabled>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-column gap-2 mt-auto">
+                                <button class="btn btn-danger" onclick="showFiles()">View Attached Files</button>
+
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-danger flex-fill" id="btn-memo">Memo</button>
+                                    <button class="btn btn-danger flex-fill" id="btn-ccf">Customer Complaint Form</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="filesModal" tabindex="-1" aria-labelledby="filesModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="filesModalLabel">Attached File</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <img src="" style="width: 100%;" id="cevidence">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -643,13 +729,67 @@
                     }
                 });
             });
+
+            document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('.complaint-link').forEach(link => {
+                    link.addEventListener('click', function (event) {
+                        event.preventDefault();
+
+                        const complaintId = this.getAttribute('data-id');
+
+                        $.ajax({
+                            url: '/complaint/' + complaintId,
+                            method: 'GET',
+                            success: function (data) {
+                                let specificDate = new Date(data.created_at);
+                                let formattedSpecificDate = specificDate.toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric',
+                                });
+
+                                $('#complaint-form').attr('action', "{{ url('update-status'), '' }}/" + complaintId);
+                                $('#csub').text(formattedSpecificDate);
+                                $('#cago').html(`(${data.ago})`);
+                                $('#cdetails').text(data.details);
+                                $('#coffice').val(data.office);
+                                $('#cname').val(data.name);
+                                $('#ctype').val(data.type);
+                                $('#cemail').val(data.email);
+                                $('#cnumber').val(data.number);
+                                $('#cevidence').attr('src', "{{ Storage::url('') }}" + data.evidence);
+                                
+
+                                if (data.status == 0) {
+                                    $('#btn-memo').prop('disabled', true);
+                                    $('#btn-ccf').prop('disabled', true);
+                                } else {
+                                    $('#btn-memo').prop('disabled', false);
+                                    $('#btn-ccf').prop('disabled', false);
+                                }
+
+                                const complaintTab = document.getElementById('btn-complaint');
+                                complaintTab.click();
+                            },
+                            error: function (xhr) {
+                                console.error('Error: ', xhr.responseText);
+                            }
+                        });
+                    });
+                });
+            });
+        
+            function showFiles() {
+                console.log('logged');
+                $('#filesModal').modal('show');
+            }
         </script>
 
         @if($new_complaints)
             <script>
                 document.addEventListener('DOMContentLoaded', event => {
                     var modal = new bootstrap.Modal(document.getElementById("notifications"));
-                    modal.show();
+                    // modal.show();
                 });
             </script>
         @endif

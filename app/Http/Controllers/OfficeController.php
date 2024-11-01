@@ -53,7 +53,7 @@ class OfficeController extends Controller
             $processing = Complaints::whereIn('status', [1, 3])->get()->count();
             $forms = Form::all();
 
-            $new_complaints = Complaints::where('is_read', false)->where('created_at', '>', Auth::user()->last_activity)->get();
+            $new_complaints = Complaints::where('is_read', false)->where('created_at', '<', Auth::user()->last_activity)->get();
 
             $user = User::where('id', Auth::user()->id)->first();
             $user->last_activity = Carbon::now();

@@ -31,7 +31,7 @@ class ComplaintController extends Controller
         $complaint = new Complaints();
         
         $complaint->name = $request->input('name');
-        $complaint->user_type = $request->input('user_type');
+        $complaint->user_type = $request->input('type');
         $complaint->complaint_type = $request->input('complaint_type');
         $complaint->details = $request->input('details');
         $complaint->email = $request->input('email');
@@ -50,12 +50,30 @@ class ComplaintController extends Controller
     public function view ($id)
     {
         $complaint = Complaints::where('id', $id)->first();
-        $office = Office::where('id', $complaint->office_id)->first();
 
         $complaint->is_read = true;
         $complaint->save();
 
-        return view('complaint')->with(['complaint' => $complaint, 'office' => $office]);
+        return response()->json([
+            'created_at' => $complaint->created_at,
+            'ago' => Carbon::parse($complaint->created_at)->diffForHumans(),
+            'details' => $complaint->details,
+            'office' => $complaint->office_id,
+            'name' => $complaint->name,
+            'type' => $complaint->user_type,
+            'email' => $complaint->email,
+            'number' => $complaint->phone,
+            'status' => $complaint->status,
+            'evidence' => $complaint->image_path,
+        ]);
+
+        // $complaint = Complaints::where('id', $id)->first();
+        // $office = Office::where('id', $complaint->office_id)->first();
+
+        // $complaint->is_read = true;
+        // $complaint->save();
+
+        // return view('complaint')->with(['complaint' => $complaint, 'office' => $office]);
     }
 
     public function update_status (Request $request, $id)

@@ -151,6 +151,7 @@
                         <textarea class="form-control" style="resize: none;" rows="5" id="similar" {{ $auth->office_id == 1 ? 'disabled' : '' }} name="nonconformity">{{ $form->nonconformity ?? '' }}</textarea>
                     </div>
 
+                    <!-- Corrective Actions -->
                     <div class="row mt-3 w-75">
                         <div class="col-md-7 form-group">
                             <label class="form-label" for="actions">Corrective Actions</label>
