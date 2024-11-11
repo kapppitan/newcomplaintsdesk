@@ -30,8 +30,7 @@
     </head>
 
     <body class="bg-secondary px-5 pt-0 pb-5 d-flex flex-column align-items-center">
-        <div class="d-flex p-3 w-100 justify-content-between align-items-center">
-            <a href="{{ url()->previous() }}" class="btn btn-primary">Back</a>
+        <div class="d-flex p-3 w-100 justify-content-end align-items-center">
             <button class="btn btn-danger" onclick="print_form()">Print</button>
         </div>
 
@@ -60,12 +59,18 @@
 
             <div class="d-flex mb-3">
                 <label class="form-label" style="width: 100px;">FOR:</label>
-                <label class="form-label fw-bold">{{ $memo->for }}</label>
+                <div class="d-flex flex-column">
+                    <label class="form-label fw-bold m-0">{{ $memo->for }}</label>
+                    <label>{{ $memo->for_role }}</label>
+                </div>
             </div>
 
             <div class="d-flex mb-3">
                 <label class="form-label" style="width: 100px;">FROM:</label>
-                <label class="form-label fw-bold">{{ $memo->from }}</label>
+                <div class="d-flex flex-column">
+                    <label class="form-label fw-bold m-0">{{ $memo->from }}</label>
+                    <label>{{ $memo->from_role }}</label>
+                </div>
             </div>
 
             <div class="d-flex mb-3">
@@ -75,7 +80,7 @@
 
             <div class="d-flex mb-3">
                 <label class="form-label" style="width: 100px;">DATE:</label>
-                <label class="form-label fw-bold"></label>
+                <label class="form-label fw-bold">{{ date('F j, Y', strtotime($memo->created_at)) }}</label>
             </div>
 
             <hr class="border-2 border-dark">

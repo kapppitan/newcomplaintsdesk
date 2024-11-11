@@ -50,6 +50,7 @@ class ComplaintController extends Controller
     public function view ($id)
     {
         $complaint = Complaints::where('id', $id)->first();
+        $office = Office::find($complaint->office_id);
 
         $complaint->is_read = true;
         $complaint->save();
@@ -58,31 +59,25 @@ class ComplaintController extends Controller
             'created_at' => $complaint->created_at,
             'ago' => Carbon::parse($complaint->created_at)->diffForHumans(),
             'details' => $complaint->details,
-            'office' => $complaint->office_id,
+            'office' => $office,
             'name' => $complaint->name,
             'type' => $complaint->user_type,
             'email' => $complaint->email,
             'number' => $complaint->phone,
             'status' => $complaint->status,
             'evidence' => $complaint->image_path,
+            'has_memo' => $complaint->has_memo,
         ]);
-
-        // $complaint = Complaints::where('id', $id)->first();
-        // $office = Office::where('id', $complaint->office_id)->first();
-
-        // $complaint->is_read = true;
-        // $complaint->save();
-
-        // return view('complaint')->with(['complaint' => $complaint, 'office' => $office]);
     }
 
     public function update_status (Request $request, $id)
     {
         $complaint = Complaints::where('id', $id)->first();
 
-        $complaint->status = $request->status;
+        $complaint->status = $request->cstatus;
+        $complaint->is_read = false;
 
-        if ($request->status == 1 and $complaint->ticket_id == null)
+        if ($request->status == 0 and $complaint->ticket_id == null)
         {
             $ticket = new Ticket();
             $ticket->ticket_number = Ticket::count() + 1;
@@ -139,6 +134,7 @@ class ComplaintController extends Controller
         $form->acknowledged_on = $request->acknowledged_on ?? $form->acknowledged_on;
         $form->feedback = $request->feedback ?? $form->feedback;
         $form->reported_by = $request->reported_by ?? $form->reported_by;
+        $form->date_reported = $request->date_reported;
         $form->is_approved = (int) $request->input('accept');
         $form->further_action = $request->reasons ?? $form->further_action;
 
@@ -158,13 +154,18 @@ class ComplaintController extends Controller
 
     public function submit_memo (Request $request, $id)
     {
+        $complaint = Complaints::where('id', $id)->first();
         $memo = new Memo();
 
         $memo->content = $request->content;
         $memo->for = $request->recipient;
         $memo->from = $request->sender;
+        $memo->for_role = $request->recipient_role;
+        $memo->from_role = $request->sender_role;
         $memo->complaint_id = Complaints::where('id', $id)->first()->id;
-
+        $complaint->has_memo = true;
+        
+        $complaint->save();
         $memo->save();
 
         return redirect('/qao');
@@ -185,5 +186,15 @@ class ComplaintController extends Controller
         $memo = Memo::where('complaint_id', $id)->first();
 
         return view('memo_print')->with(['complaint' => $complaint, 'memo' => $memo]);
+    }
+
+    public function open_close (Request $request, $id)
+    {
+        $complaint = Complaints::where('id', $id)->first();
+
+        $complaint->is_closed = $request->comp_status;
+        $complaint->save();
+
+        return back();
     }
 }

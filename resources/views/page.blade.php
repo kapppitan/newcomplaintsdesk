@@ -57,7 +57,7 @@
                     </ul>
                 </div>
 
-                <p class="m-0 ps-1" style="font-size:xx-small;">If not in options, please specify</p>
+                <p class="m-0 ps-1" style="font-size: x-small;">If not in options, please specify</p>
             </div>
 
             <div class="form-group">

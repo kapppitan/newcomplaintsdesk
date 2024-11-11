@@ -30,8 +30,26 @@
     </head>
 
     <body class="bg-secondary px-5 pt-0 pb-5 d-flex flex-column align-items-center">
-        <div class="d-flex p-3 w-100 justify-content-between align-items-center">
+        <div class="d-flex p-3 w-100 justify-content-between align-items-center mb-3">
             <a href="{{ url()->previous() }}" class="btn btn-primary">Back</a>
+
+            @if (Auth::user()->office_id == 2)
+                <div class="d-flex gap-2 w-50">
+                    <button class="btn btn-success">Monitor</button>
+
+                    <form class="input-group" action="{{ route('open-close', ['id' => $complaint->id]) }}" method="post">
+                        @csrf
+
+                        <select class="form-select rounded-start" name="comp_status" id="comp_status">
+                            <option value="0" {{ $complaint->is_closed ? '' : 'selected' }}>Open</option>
+                            <option value="1" {{ $complaint->is_closed ? 'selected' : '' }}>Close</option>
+                        </select>
+
+                        <button type="submit" class="btn btn-danger">Update</button>
+                    </form>
+                </div>
+            @endif
+
             <button class="btn btn-danger" onclick="print_form()">Print</button>
         </div>
 
@@ -48,7 +66,7 @@
 
                 <div class="col border ps-1">
                     <p class="fw-bold m-0" style="font-size: x-small;">Date prepared:</p>
-                    <p class="m-0" style="font-size: x-small;">{{ Carbon\Carbon::parse($form->created_at)->format('Y-m-d') }}</p>
+                    <p class="m-0" style="font-size: x-small;">{{ Carbon\Carbon::parse($form->created_at)->format('F j, Y') }}</p>
                 </div>
             </div>
 
@@ -66,12 +84,12 @@
 
                 <div class="col border p-0 ps-1">
                     <p class="m-0 fw-bold border-bottom" style="font-size: x-small;">Filed by:</p>
-                    <p class="m-0" style="font-size: x-small;">{{ $complaint->name }}</p>
+                    <p class="m-0 pb-3" style="font-size: x-small;">{{ $complaint->name }}</p>
                 </div>
 
                 <div class="col border p-0 ps-1">
                     <p class="m-0 fw-bold border-bottom" style="font-size: x-small;">Date</p>
-                    <p class="m-0" style="font-size: x-small;">{{ Carbon\Carbon::parse($complaint->created_at)->format('Y-m-d') }}</p>
+                    <p class="m-0" style="font-size: x-small;">{{ Carbon\Carbon::parse($complaint->created_at)->format('F j, Y') }}</p>
                 </div>
 
                 <div class="col border p-0 ps-1">
@@ -81,7 +99,7 @@
 
                 <div class="col border p-0 ps-1">
                     <p class="m-0 fw-bold border-bottom" style="font-size: x-small;">Date</p>
-                    <p class="m-0" style="font-size: x-small;">{{ Carbon\Carbon::parse($complaint->validated_on)->format('M y') }}</p>
+                    <p class="m-0" style="font-size: x-small;">{{ Carbon\Carbon::parse($complaint->validated_on)->format('F j, Y') }}</p>
                 </div>
 
                 <div class="col border p-0 ps-1">
@@ -91,7 +109,7 @@
 
                 <div class="col border p-0 ps-1">
                     <p class="m-0 fw-bold border-bottom" style="font-size: x-small;">Date</p>
-                    <p class="m-0" style="font-size: x-small;">{{ Carbon\Carbon::parse($complaint->acknowledgedqao_on)->format('Y-m-d') }}</p>
+                    <p class="m-0" style="font-size: x-small;">{{ Carbon\Carbon::parse($complaint->acknowledgedqao_on)->format('F j, Y') }}</p>
                 </div>
             </div>
 
@@ -144,12 +162,12 @@
 
                         <div class="col p-0 border">
                             <p class="text-center bg-secondary-subtle px-3 m-0 border border-bottom" style="font-size: x-small;">IMPLEMENTATION DATE</p>
-                            <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ $form->implementation }}</p>
+                            <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ Carbon\Carbon::parse($form->implementation)->format('F j, Y') }}</p>
                         </div>
 
                         <div class="col p-0 border">
                             <p class="text-center bg-secondary-subtle px-3 m-0 border border-bottom" style="font-size: x-small;">MEASURE OF EFFECTIVENESS</p>
-                            <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ $form->effectiveness }}</p>
+                            <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ $form->measure }}</p>
                         </div>
 
                         <div class="col p-0 border">
@@ -187,32 +205,32 @@
                     <div class="row m-0">
                         <div class="col p-0">
                             <p class="m-0 ps-1 border-bottom fw-bold" style="font-size: x-small;">Prepared by:</p>
-                            <p class="m-0 ps-1" style="font-size: x-small;">{{ $users->find($form->prepared_by)->username }}</p>
+                            <p class="m-0 ps-1" style="font-size: x-small;">{{ optional($users->find($form->prepared_by))->username }}</p>
                         </div>
 
                         <div class="col p-0">
                             <p class="m-0 ps-1 border-bottom fw-bold border-end" style="font-size: x-small;">Date</p>
-                            <p class="m-0 ps-1 border-end" style="font-size: x-small;">{{ Carbon\Carbon::parse($form->prepared_on)->format('Y-m-d') }}</p>
+                            <p class="m-0 ps-1 pb-3 border-end" style="font-size: x-small;">{{ Carbon\Carbon::parse($form->prepared_on)->format('F j, Y') }}</p>
                         </div>
 
                         <div class="col p-0">
                             <p class="m-0 ps-1 border-bottom fw-bold" style="font-size: x-small;">Approved by:</p>
-                            <p class="m-0 ps-1" style="font-size: x-small;">{{ $users->find($form->approved_by)->username }}</p>
+                            <p class="m-0 ps-1" style="font-size: x-small;">{{ optional($users->find($form->approved_by))->username }}</p>
                         </div>
 
                         <div class="col p-0">
                             <p class="m-0 ps-1 border-bottom fw-bold border-end" style="font-size: x-small;">Date</p>
-                            <p class="m-0 ps-1 border-end" style="font-size: x-small;">{{ Carbon\Carbon::parse($form->approved_on)->format('Y-m-d') }}</p>
+                            <p class="m-0 ps-1 pb-3 border-end" style="font-size: x-small;">{{ Carbon\Carbon::parse($form->approved_on)->format('F j, Y') }}</p>
                         </div>
 
                         <div class="col p-0">
                             <p class="m-0 ps-1 border-bottom fw-bold" style="font-size: x-small;">Acknowledged by:</p>
-                            <p class="m-0 ps-1" style="font-size: x-small;">{{ $users->find($form->approved_by)->username }}</p>
+                            <p class="m-0 ps-1" style="font-size: x-small;">{{ optional($users->find($form->acknowledged_by))->username }}</p>
                         </div>
 
                         <div class="col p-0">
                             <p class="m-0 ps-1 border-bottom fw-bold" style="font-size: x-small;">Date</p>
-                            <p class="m-0 ps-1" style="font-size: x-small;">{{ Carbon\Carbon::parse($form->approved_on)->format('Y-m-d') }}</p>
+                            <p class="m-0 ps-1" style="font-size: x-small;">{{ Carbon\Carbon::parse($form->acknowledged_on)->format('F j, Y') }}</p>
                         </div>
                     </div>
                 </div>
@@ -228,19 +246,19 @@
                             <p class="m-0 ps-1 fw-bold border-bottom" style="font-size: x-small;">CUSTOMER FEEDBACK</p>
                             <p class="m-0 ps-1 pb-3 border-bottom" style="font-size: x-small;">{{ $form->feedback }}</p>
 
-                            <p class="m-0 ps-1 border-bottom" style="font-size: x-small;"><span class="fw-bold">Reported by:</span> {{ $form->reported_by }}</p>
+                            <p class="m-0 ps-1 border-bottom" style="font-size: x-small;"><span class="fw-bold">Reported by:</span> {{ optional(\App\Models\User::where('id', $form->reported_by)->first())->username }}</p>
                             <p class="m-0 ps-1 pb-3 border-bottom" style="font-size: x-small;"><span class="fw-bold">Date:</span> {{ $form->date_reported }}</p>
                         </div>
 
                         <div class="col p-0 ps-1 border-start">
-                            <div>
-                                <input type="radio" name="accept" {{ $form->is_approved ? 'selected' : '' }}>
-                                <label style="font-size: x-small;" for="radio_accepted" id="accept">ACCEPTED</label>
+                            <div class="d-flex align-items-center">
+                                <input type="radio" name="accept" {{ $form->is_approved ? 'checked' : '' }} disabled>
+                                <label class="p-1" style="font-size: x-small;" for="radio_accepted" id="accept">ACCEPTED</label>
                             </div>
 
-                            <div>
-                                <input type="radio" name="accept" {{ $form->is_approved ? '' : 'selected' }}>
-                                <label style="font-size: x-small;" for="radio_accepted" id="notaccept">NOT ACCEPTED (FURTHER ACTION PLAN)</label>
+                            <div class="d-flex align-items-center">
+                                <input type="radio" name="accept" {{ $form->is_approved ? '' : 'checked' }} disabled>
+                                <label class="ps-1" style="font-size: x-small;" for="radio_accepted" id="notaccept">NOT ACCEPTED (FURTHER ACTION PLAN)</label>
                             </div>
                         </div>
                     </div>
@@ -252,7 +270,40 @@
             <div class="row m-0">
                 <div class="col-md-1 px-1 p-0 border" style="width: 20px; font-size: x-small;">11</div>
                 <div class="col p-0 border">
-                    
+                    <p class="m-0 ps-1 fw-bold" style="font-size: x-small">VERIFICATION OF EFFECTIVENESS OF ACTION:</p>
+                    <p class="m-0 ps-1 border-bottom" style="font-size: x-small">(Check implementation details. Record evidence of effectiveness, include date of next verification, if possible)</p>
+                    <div class="row m-0 border-bottom">
+                        <div class="col">
+
+                        </div>
+                        
+                        <div class="col border-start ps-1">
+                            <p class="m-0 fw-bold" style="font-size: x-small;">VERIFICATION EVIDENCE</p>
+                            <p class="m-0 pb-3" style="font-size: x-small;">test_evidence</p>
+                        </div>
+                    </div>
+
+                    <div class="row m-0 border-bottom">
+                        <div class="col ps-1">
+                            <p class="fw-bold" style="font-size: x-small;">Verified by: <span class="fw-light">test_user</span></p>
+                        </div>
+
+                        <div class="col ps-1">
+                            <p class="fw-bold" style="font-size: x-small;">Date: <span class="fw-light">test_date</span></p>
+                        </div>
+                    </div>
+
+                    <div class="col p-2 d-flex flex-column gap-2" style="font-size: x-small;">
+                        <div class="form-group d-flex align-items-center">
+                            <input type="radio" name="open" id="open" disabled {{ optional($complaint)->is_closed ? '' : 'checked' }}>
+                            <p class="m-0 ps-1">Open Status</p>
+                        </div>
+
+                        <div class="form-group d-flex align-items-center">
+                            <input type="radio" name="open" id="closed" disabled {{ optional($complaint)->is_closed ? 'checked' : '' }}>
+                            <p class="m-0 ps-1">Close Status</p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

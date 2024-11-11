@@ -11,22 +11,24 @@
         <title>Customer Complaint Form</title>
     </head>
 
-    <body class="bg-light h-100 p-3">
+    <body class="bg-light h-100 p-3 overflow-y-scroll">
         <div class="d-flex gap-2 align-items-center justify-content-between">
             @if(Auth::user()->office_id == 1)
-                <a href="/qao/complaint/{{ $complaint->id }}">Back</a>
+                <a href="/qao">Back</a>
+            @elseif(Auth::user()->office_id == 2)
+                <a href="/qmso">Back</a>
             @else
-                <a href="/office/">Back</a>
+                <a href="/office">Back</a>
             @endif
 
             <h4 class="text-danger position-absolute start-50 translate-middle-x" style="top: 15px;">Customer Complaint Form</h4>
             <div class="d-flex gap-2">
-                <a class="btn btn-secondary" href="/qao/complaint/form/print/{{ $complaint->id }}">
+                <a class="btn btn-secondary" href="/complaint/form/print/{{ $complaint->id }}">
                     <i class="bi bi-printer"></i>
                 </a>
 
-                @if ($auth->office_id != 1)
-                    <a class="btn btn-primary" href="/office/complaint/memo/print/{{ $complaint->id }}">View Memo</a>
+                @if ($auth->office_id != 1 && $auth->office_id != 2)
+                    <a class="btn btn-primary" href="/complaint/memo/print/{{ $complaint->id }}">View Memo</a>
                 @endif
 
                 @if ($auth->office_id == 1)
@@ -44,6 +46,8 @@
                             <button class="btn btn-danger" disabled>Submit Form</button>
                             @break
                     @endswitch
+                @elseif ($auth->office_id == 2)
+                    <!-- None -->
                 @else
                     <button class="btn btn-danger" onclick="confirm_form()">Submit Form</button>
                 @endif
@@ -62,7 +66,7 @@
             </li>
 
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="qao-btn" data-bs-toggle="tab" data-bs-target="#qao-tab" type="button" role="tab" aria-controls="qao-tab" aria-selected="false" {{ $auth->office_id != 1 ? 'disabled' : '' }}>QAO</button>
+                <button class="nav-link" id="qao-btn" data-bs-toggle="tab" data-bs-target="#qao-tab" type="button" role="tab" aria-controls="qao-tab" aria-selected="false">QAO</button>
             </li>
         </nav>
 
@@ -151,40 +155,49 @@
                         <textarea class="form-control" style="resize: none;" rows="5" id="similar" {{ $auth->office_id == 1 ? 'disabled' : '' }} name="nonconformity">{{ $form->nonconformity ?? '' }}</textarea>
                     </div>
 
-                    <!-- Corrective Actions -->
-                    <div class="row mt-3 w-75">
-                        <div class="col-md-7 form-group">
-                            <label class="form-label" for="actions">Corrective Actions</label>
-                            <textarea class="form-control" style="resize: none;" rows="13" id="actions" {{ $auth->office_id == 1 ? 'disabled' : '' }} name="corrective_action">{{ $form->corrective_action ?? '' }}</textarea>
-                        </div>
+                    <div class="mt-3 w-75">
+                        <div class="d-flex flex-column gap-3">
+                            <div class="row d-flex" id="corrective_action_1">
+                                <div class="col-md-7 form-group">
+                                    <label class="form-label" for="actions">Corrective Actions</label>
+                                    <textarea class="form-control" style="resize: none;" rows="13" id="actions" {{ $auth->office_id == 1 ? 'disabled' : '' }} name="corrective_action">{{ $form->corrective_action ?? '' }}</textarea>
+                                </div>
 
-                        <div class="col-md-5 d-flex gap-2 flex-column">
-                            <div class="d-flex flex-column form-group">
-                                <label class="form-label" for="implementation">Implementation Date</label>
-                                <input 
-                                    class="form-control" 
-                                    type="date" 
-                                    id="implementation" 
-                                    {{ $auth->office_id == 1 ? 'disabled' : '' }} 
-                                    value="{{ optional($form)->implementation ? \Carbon\Carbon::parse($form->implementation)->format('Y-m-d') : '' }}" 
-                                    name="implementation"
-                                >
+                                <div class="col-md-5 d-flex gap-2 flex-column">
+                                    <div class="d-flex flex-column form-group">
+                                        <label class="form-label" for="implementation">Implementation Date</label>
+                                        <input 
+                                            class="form-control" 
+                                            type="date" 
+                                            id="implementation" 
+                                            {{ $auth->office_id == 1 ? 'disabled' : '' }} 
+                                            value="{{ optional($form)->implementation ? \Carbon\Carbon::parse($form->implementation)->format('Y-m-d') : '' }}" 
+                                            name="implementation"
+                                        >
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="effectiveness">Measure of Effectiveness</label>
+                                        <textarea class="form-control" style="resize: none;" rows="3" name="effectiveness" id="effectiveness" {{ $auth->office_id == 1 ? 'disabled' : '' }} name="measure">{{ $form->measure ?? '' }}</textarea>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="period">Monitoring Period for CA</label>
+                                        <input class="form-control" type="text" id="period" {{ $auth->office_id == 1 ? 'disabled' : '' }} value="{{ $form->period ?? '' }}" name="period">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label" for="responsible">Responsible</label>
+                                        <input class="form-control" type="text" id="responsible" {{ $auth->office_id == 1 ? 'disabled' : '' }} value="{{ $form->responsible ?? '' }}" name="responsible">
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="form-group">
-                                <label class="form-label" for="effectiveness">Measure of Effectiveness</label>
-                                <textarea class="form-control" style="resize: none;" rows="3" name="effectiveness" id="effectiveness" {{ $auth->office_id == 1 ? 'disabled' : '' }} name="measure">{{ $form->measure ?? '' }}</textarea>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="period">Monitoring Period for CA</label>
-                                <input class="form-control" type="text" id="period" {{ $auth->office_id == 1 ? 'disabled' : '' }} value="{{ $form->period ?? '' }}" name="period">
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="responsible">Responsible</label>
-                                <input class="form-control" type="text" id="responsible" {{ $auth->office_id == 1 ? 'disabled' : '' }} value="{{ $form->responsible ?? '' }}" name="responsible">
-                            </div>
+                            @if ($auth->office_id != 1 && $auth->office_id != 2)
+                                <button class="btn btn-primary w-100" type="button" onclick="add_corrective_action()" id="corrective_btn">
+                                    <i class="bi-plus-lg me-2"></i>Add Corrective Action
+                                </button>
+                            @endif
                         </div>
 
                         <div class="d-flex mt-5 gap-4">
@@ -364,6 +377,15 @@
 
             function submit_form() {
                 document.getElementById('formContent').submit();
+            }
+
+            function add_corrective_action() {
+                var corrective = document.getElementById('corrective_action_1');
+                var btn = document.getElementById('corrective_btn');
+
+                let new_corrective = corrective.cloneNode(true);
+
+                btn.before(new_corrective);
             }
         </script>
     </body>

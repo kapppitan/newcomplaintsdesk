@@ -13,12 +13,12 @@
 
     <body class="bg-light p-3">
         <div class="d-flex gap-2 align-items-center justify-content-between">
-            <a href="/qao/complaint/{{ $complaint->id }}">Back</a>
+            <a href="/qao">Back</a>
 
             <h4 class="text-danger position-absolute start-50 translate-middle-x" style="top: 15px;">Memo</h4>
 
             <div class="d-flex gap-2">
-                <a class="btn btn-secondary" href="/qao/complaint/memo/print/{{ $complaint->id }}">
+                <a class="btn btn-secondary" href="/complaint/memo/print/{{ $complaint->id }}">
                     <i class="bi bi-printer"></i>
                 </a>
 
@@ -31,20 +31,28 @@
         <form action="{{ route('submit-memo', ['id' => $complaint->id]) }}" method="post" id="create_memo">
             @csrf
 
-            <div class="col d-flex gap-5 mb-2">
-                <div class="form-group d-flex gap-2 align-items-center w-100">
-                    <label class="form-label m-0" for="recipient">For</label>
-                    <input class="form-control" type="text" name="recipient" id="recipient">
+            <div class="d-flex flex-column gap-2">
+                <div class="d-flex flex-column gap-2">
+                    <div class="input-group">
+                        <span class="input-group-text" style="width: 100px;">From</span>
+                        <input class="form-control" type="text" name="sender" id="sender" value="{{ $memo->from ?? '' }}">
+                        <span class="input-group-text">Role</span>
+                        <input class="form-control" type="text" name="sender_role" id="sender_role" value="{{ $memo->from_role ?? '' }}">
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-group-text" style="width: 100px;">To</span>
+                        <input class="form-control" type="text" name="recipient" id="recipient" value="{{ $memo->for ?? '' }}">
+                        <span class="input-group-text">Role</span>
+                        <input class="form-control" type="text" name="recipient_role" id="recipient_role" value="{{ $memo->for_role ?? '' }}">
+                    </div>
                 </div>
 
-                <div class="form-group d-flex gap-2 align-items-center w-100">
-                    <label class="form-label m-0" for="sender">From</label>
-                    <input class="form-control" type="text" name="sender" id="sender">
+                <div class="form-group d-flex flex-column">
+                    <label class="form-label" for="content">Content</label>
+                    <textarea class="form-control" style="resize: none;" rows="20" name="content" id="content">{{ $memo->content ?? '' }}</textarea>
                 </div>
             </div>
-
-            <label class="form-label" for="content">Content</label>
-            <textarea class="form-control" rows="16" style="resize: none;" name="content" id="content"></textarea>
         </form>
 
         <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">

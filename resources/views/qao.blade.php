@@ -36,7 +36,7 @@
                 <ul class="nav nav-pills nav-fill flex-column mb-auto gap-2" role="tablist" id="nav">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link bg-danger text-light d-flex active" id="btn-overview" data-bs-toggle="pill" data-bs-target="#tab-overview" type="button" role="tab" aria-controls="btn-overview" aria-selected="true">
-                            <i class="bi-speedometer me-2"></i>Overview
+                            <i class="bi-speedometer me-2"></i>Dashboard
                         </button>
                     </li>
 
@@ -47,24 +47,39 @@
                             </div>
                             <span class="badge">
                                 @if ($pending > 0)
-                                    {{ $pending }}
+                                    {{ App\Models\Complaints::where('status', 0)->count() }}
                                 @endif
                             </span>
                         </button>
                     </li>
 
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link bg-danger text-light d-flex align-items-center" id="btn-closed" data-bs-toggle="pill" data-bs-target="#tab-closed" type="button" role="tab" aria-controls="btn-closed" aria-selected="false">
+                        <button class="nav-link bg-danger text-light d-flex align-items-center" id="btn-processing" data-bs-toggle="pill" data-bs-target="#tab-processing" type="button" role="tab" aria-controls="btn-processing" aria-selected="false">
                             <div class="me-auto">    
                                 <i class="bi-file-earmark-check-fill me-2"></i>Processing
                             </div>
                             <span class="badge">
                                 @if ($processing > 0)
-                                    {{ $processing }}
+                                    {{ App\Models\Complaints::where('status', 1)->count() }}
                                 @endif
                             </span>
                         </button>
                     </li>
+
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link bg-danger text-light d-flex align-items-center" id="btn-non" data-bs-toggle="pill" data-bs-target="#tab-non" type="button" role="tab" aria-controls="btn-non" aria-selected="false">
+                            <div class="me-auto">    
+                                <i class="bi-envelope-slash-fill me-2"></i>Non-Conformity
+                            </div>
+                            <span class="badge">
+                                @if ($processing > 0)
+                                    {{ App\Models\Complaints::where('status', 2)->count() }}
+                                @endif
+                            </span>
+                        </button>
+                    </li>
+
+                    <hr class="border-light border-2">
 
                     <li class="nav-item" role="presentation">
                         <button class="nav-link bg-danger text-light d-flex" id="btn-archived" data-bs-toggle="pill" data-bs-target="#tab-archived" type="button" role="tab" aria-controls="btn-archived" aria-selected="false">
@@ -93,13 +108,148 @@
             </div>
 
             <div class="col-10 tab-content p-3 h-100 overflow-scroll overflow-x-hidden" id="tabContent">
-                <div class="tab-pane fade flex-column show active" id="tab-overview" role="tabpanel" aria-labelledby="btn-overview" tabindex="0">
+                <div class="tab-pane flex-column show active gap-2" id="tab-overview" role="tabpanel" aria-labelledby="btn-overview" tabindex="0">
+                    <div class="d-flex align-items-center">
+                        <h5 class="text-secondary-emphasis m-0">Dashboard</h5>
+                        <input class="form-control w-25 ms-auto" type="search" name="search" placeholder="Search..." onkeyup="search_complaint(1)" id="search-pending">
+                    </div>    
                     
+                    <hr class="border-2">
+
+                    <div class="container text-center d-flex flex-column gap-4 mb-5">
+                        <div class="row d-flex gap-2">
+                            <div class="col">
+                                <p class="fw-bold py-2 m-0 bg-danger text-white rounded-top">Slow Service</p>
+                                <div class="d-flex py-2 bg-white rounded-bottom">
+                                    <div class="d-flex flex-column w-50 py-3">
+                                        <p class="fw-bold m-0">Processing</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 1)->where('status', 1)->count() }}</p>
+                                    </div>
+
+                                    <div class="vr"></div>
+
+                                    <div class="d-flex flex-column w-50 py-3">
+                                        <p class="fw-bold m-0">Closed</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 1)->where('status', 4)->count() }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <p class="fw-bold py-2 m-0 bg-danger text-white rounded-top">Unruly/Disrespectful Personnel</p>
+                                <div class="d-flex py-2 bg-white rounded-bottom">
+                                    <div class="d-flex flex-column w-50 py-3">
+                                        <p class="fw-bold m-0">Processing</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 2)->where('status', 1)->count() }}</p>
+                                    </div>
+
+                                    <div class="vr"></div>
+
+                                    <div class="d-flex flex-column w-50 py-3">
+                                        <p class="fw-bold m-0">Closed</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 2)->where('status', 4)->count() }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <p class="fw-bold py-2 m-0 bg-danger text-white rounded-top">No Response</p>
+                                <div class="d-flex py-2 bg-white rounded-bottom">
+                                    <div class="d-flex flex-column w-50 py-3">
+                                        <p class="fw-bold m-0">Processing</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 3)->where('status', 1)->count() }}</p>
+                                    </div>
+
+                                    <div class="vr"></div>
+
+                                    <div class="d-flex flex-column w-50 py-3">
+                                        <p class="fw-bold m-0">Closed</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 3)->where('status', 4)->count() }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row d-flex gap-2">
+                            <div class="col">
+                                <p class="fw-bold py-2 m-0 bg-danger text-white rounded-top">Errors on Request</p>
+                                <div class="d-flex py-2 bg-white rounded-bottom">
+                                    <div class="d-flex flex-column w-50 py-3">
+                                        <p class="fw-bold m-0">Processing</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 4)->where('status', 1)->count() }}</p>
+                                    </div>
+
+                                    <div class="vr"></div>
+
+                                    <div class="d-flex flex-column w-50 py-3">
+                                        <p class="fw-bold m-0">Closed</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 4)->where('status', 4)->count() }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <p class="fw-bold py-2 m-0 bg-danger text-white rounded-top">Delayed Issuance of Request</p>
+                                <div class="d-flex py-2 bg-white rounded-bottom">
+                                    <div class="d-flex flex-column w-50 py-3">
+                                        <p class="fw-bold m-0">Processing</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 5)->where('status', 1)->count() }}</p>
+                                    </div>
+
+                                    <div class="vr"></div>
+
+                                    <div class="d-flex flex-column w-50 py-3">
+                                        <p class="fw-bold m-0">Closed</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 5)->where('status', 4)->count() }}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col">
+                                <p class="fw-bold py-2 m-0 bg-danger text-white rounded-top">Others</p>
+                                <div class="d-flex py-2 bg-white rounded-bottom">
+                                    <div class="d-flex flex-column w-50 py-3">
+                                        <p class="fw-bold m-0">Processing</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 6)->where('status', 1)->count() }}</p>
+                                    </div>
+
+                                    <div class="vr"></div>
+
+                                    <div class="d-flex flex-column w-50 py-3">
+                                        <p class="fw-bold m-0">Closed</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 6)->where('status', 4)->count() }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="w-50">Office</th>
+                                <th class="text-center">Open</th>
+                                <th class="text-center">Closed</th>
+                                <th class="text-center">Total No. of Complaints</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach ($offices as $office)
+                                <tr>
+                                    <td class="w-50">{{ $office->office_name }}</td>
+                                    <td class="text-center">{{ App\Models\Complaints::where('office_id', $office->id)->count() }}</td>
+                                    <td class="text-center">{{ App\Models\Complaints::where('office_id', $office->id)->count() }}</td>
+                                    <td class="text-center">{{ App\Models\Complaints::where('office_id', $office->id)->count() }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
                 
-                <div class="tab-pane fade flex-column" id="tab-pending" role="tabpanel" aria-labelledby="btn-peding" tabindex="0">
-                    <div class="d-flex">
-                        <h5 class="text-secondary-emphasis">Pending Cases</h5>
+                <div class="tab-pane flex-column" id="tab-pending" role="tabpanel" aria-labelledby="btn-pending" tabindex="0">
+                    <div class="d-flex align-items-center">
+                        <h5 class="text-secondary-emphasis m-0">Pending Cases</h5>
                         <input class="form-control w-25 ms-auto" type="search" name="search" placeholder="Search..." onkeyup="search_complaint(1)" id="search-pending">
                     </div>
                     
@@ -119,7 +269,7 @@
                                 @if ($complaint->status === 0 or $complaint->status === 3)
                                     <a href="complaint/{{ $complaint->id }}" class="list-group-item complaint-link" data-toggle="tab" aria-current="true" data-id="{{ $complaint->id }}">
                                         <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1 {{ $complaint->is_read == true ? 'text-secondary' : '' }}">{{ \Illuminate\Support\Str::limit($complaint->details, 50, $end = "...") }}</h5>
+                                            <h5 class="mb-1 {{ $complaint->is_read == true ? 'text-secondary' : '' }}">{{ \Illuminate\Support\Str::limit($complaint->details, 70, $end = "...") }}</h5>
                                             <small class="text-secondary">{{ $complaint->created_at->diffForHumans() }}</small>
                                         </div>
 
@@ -165,9 +315,9 @@
                     </div>
                 </div>
                 
-                <div class="tab-pane fade flex-column" id="tab-closed" role="tabpanel" aria-labelledby="btn-closed" tabindex="0">
-                    <div class="d-flex">
-                        <h5 class="text-secondary-emphasis">Processing Cases</h5>
+                <div class="tab-pane flex-column" id="tab-processing" role="tabpanel" aria-labelledby="btn-processing" tabindex="0">
+                    <div class="d-flex align-items-center">
+                        <h5 class="text-secondary-emphasis m-0">Processing Cases</h5>
                         <input class="form-control w-25 ms-auto" type="search" name="search-processing" placeholder="Search..." onkeyup="search_complaint(2)" id="search-processing">
                     </div>
     
@@ -184,12 +334,12 @@
                             <p class="text-center text-secondary m-0">No processed complaints!</p>
                         @else
                             @foreach ($tcomplaints as $complaint)
-                                @if ($complaint->status > 0 && $complaint->status < 3)
-                                    <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
+                                @if ($complaint->status > 0 && $complaint->status < 3 && $complaint->status != 2)
+                                    <a href="complaint/{{ $complaint->id }}" class="list-group-item complaint-link" aria-current="true" data-id="{{ $complaint->id }}">
                                         <div class="d-flex w-100 justify-content-between">
                                             <h5 class="mb-1">
                                                 <span class="text-secondary">#{{ $complaint->ticket->ticket_number }}</span>
-                                                {{ \Illuminate\Support\Str::limit($complaint->details, 50, $end = "...") }}
+                                                {{ \Illuminate\Support\Str::limit($complaint->details, 70, $end = "...") }}
                                             </h5>
                                             <small class="text-secondary">{{ $complaint->created_at->diffForHumans() }}</small>
                                         </div>
@@ -239,7 +389,7 @@
                                                         <span class="badge text-bg-danger rounded-pill">Returned</span>
                                                         @break
                                                     @case(3)
-                                                        <span class="badge text-bg-info rounded-pill">Submitted</span>
+                                                        <span class="badge text-bg-info text-white rounded-pill">Submitted</span>
                                                         @break
                                                 @endswitch
                                             </h6>
@@ -251,9 +401,9 @@
                     </div>
                 </div>
                 
-                <div class="tab-pane fade flex-column" id="tab-archived" role="tabpanel" aria-labelledby="btn-archived" tabindex="0">
-                    <div class="d-flex">
-                        <h5 class="text-secondary-emphasis">Archived Cases</h5>
+                <div class="tab-pane flex-column" id="tab-archived" role="tabpanel" aria-labelledby="btn-archived" tabindex="0">
+                    <div class="d-flex align-items-center">
+                        <h5 class="text-secondary-emphasis m-0">Archived Cases</h5>
                         <input class="form-control w-25 ms-auto" type="search" name="search-archived" placeholder="Search..." onkeyup="search_complaint(3)" id="search-archive">
                     </div>
 
@@ -271,9 +421,9 @@
                         @else
                             @foreach ($complaints as $complaint)
                                 @if ($complaint->status === 4)
-                                    <a href="qao/complaint/{{ $complaint->id }}" class="list-group-item" aria-current="true">
+                                    <a href="complaint/{{ $complaint->id }}" class="list-group-item complaint-link" aria-current="true" data-id="{{ $complaint->id }}">
                                         <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 50, $end = "...") }}</h5>
+                                            <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 70, $end = "...") }}</h5>
                                             <small class="text-secondary">Closed on {{ date('F j, Y', strtotime($complaint->updated_at)) }}</small>
                                         </div>
 
@@ -311,69 +461,74 @@
                         @endif
                     </div>
                 </div>
-                
-                <div class="tab-pane fade flex-column" id="tab-management" role="tabpanel" aria-labelledby="btn-management" tabindex="0">
-                    <h5 class="text-secondary-emphasis">Management</h5>
-                    <hr class="border-2">
 
-                    <ul class="nav nav-tabs" role="tablist" id="settings">
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link text-dark active" id="settings-account" data-bs-toggle="tab" data-bs-target="#tab-accounts" type="button" role="tab" aria-controls="settings-account" aria-selected="true">
-                                Create Account
-                            </button>
-                        </li>
-
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link text-dark" id="settings-offices" data-bs-toggle="tab" data-bs-target="#tab-offices" type="button" role="tab" aria-controls="settings-offices" aria-selected="false">
-                                Create Office
-                            </button>
-                        </li>
-                    </ul>
-
-                    <div class="tab-content mb-5 p-3 bg-white border border-top-0 border-1" id="settings">
-                        <div class="tab-pane fade show active" id="tab-accounts" role="tabpanel" aria-labelledby="tab-accounts" tabindex="0">
-                            <form class="flex-column d-flex" method="post" action="{{ route('create-account') }}" id="form-accounts">
-                                @csrf
-
-                                <div class="input-group mb-2">
-                                    <span class="input-group-text w-25">Username</span>
-                                    <input class="form-control" type="text" name="username" required>
-                                </div>
-
-                                <div class="input-group mb-2">
-                                    <span class="input-group-text w-25">Default Password</span>
-                                    <input class="form-control" type="text" name="password" required>
-                                </div>
-
-                                <div class="input-group mb-2">
-                                    <label class="input-group-text w-25">Office</label>
-                                    <select class="form-select" name="office" required>
-                                        @foreach ($offices as $office)
-                                            <option value="{{ $office->id }}">{{ $office->office_name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <button class="btn btn-danger ms-auto" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal">Create Account</button>
-                            </form>
-                        </div>
-
-                        <div class="tab-pane fade" id="tab-offices" role="tabpanel" aria-labelledby="tab-offices" tabindex="0">
-                            <form class="flex-column d-flex" method="post" action="{{ route('create-office') }}" id="form-offices">
-                                @csrf
-
-                                <div class="input-group mb-2">
-                                    <span class="input-group-text w-25">Office Name</span>
-                                    <input class="form-control" type="text" name="office-name" required>
-                                </div>
-
-                                <button class="btn btn-danger ms-auto" type="button" data-bs-toggle="modal" data-bs-target="#confirmOffice">Create Office</button>
-                            </form>
-                        </div>
+                <div class="tab-pane flex-column" id="tab-non" role="tabpanel" aria-labelledby="btn-non" tabindex="0">
+                    <div class="d-flex align-items-center">
+                        <h5 class="text-secondary-emphasis m-0">Non-Conformity Cases</h5>
+                        <input class="form-control w-25 ms-auto" type="search" name="search-non" placeholder="Search..." onkeyup="search_complaint(4)" id="search-non">
                     </div>
 
-                    <div class="d-flex">
-                        <h5 class="text-secondary-emphasis">Accounts</h5>
+                    <hr class="border-2">
+
+                    <div class="list-group" id="complaints-archive">
+                        @php
+                            $archivedComplaints = $complaints->filter(function($complaint) {
+                                return ($complaint->status == 2);
+                            });
+                        @endphp
+
+                        @if ($archivedComplaints->isEmpty())
+                            <p class="text-center text-secondary m-0">No non-conforming complaints!</p>
+                        @else
+                            @foreach ($complaints as $complaint)
+                                @if ($complaint->status === 2)
+                                    <a href="complaint/{{ $complaint->id }}" class="list-group-item complaint-link" aria-current="true" data-id="{{ $complaint->id }}">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 70, $end = "...") }}</h5>
+                                            <small class="text-secondary">{{ $complaint->created_at->diffForHumans() }}</small>
+                                        </div>
+
+                                        <p class="mb-2">
+                                            @switch ($complaint->complaint_type)
+                                                @case(1)
+                                                    Slow service
+                                                    @break
+                                                @case(2)
+                                                    Unruly/disrespectful personnel
+                                                    @break
+                                                @case(3)
+                                                    No response
+                                                    @break
+                                                @case(4)
+                                                    Error/s on request
+                                                    @break
+                                                @case(5)
+                                                    Delayed issuance of request
+                                                    @break
+                                                @case(6)
+                                                    Others (Specific issue)
+                                                    @break
+                                            @endswitch
+                                        </p>
+
+                                        <small class="text-secondary" style="font-size: 12px;">
+                                            <h6><span class="badge text-bg-danger rounded-pill">Non-Conforming</span></h6>
+                                        </small>
+                                    </a>
+                                @endif
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
+                
+                <div class="tab-pane flex-column" id="tab-management" role="tabpanel" aria-labelledby="btn-management" tabindex="0">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="text-secondary-emphasis m-0">Accounts</h5>
+
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-danger" onclick="showOffice()">Create Office</button>
+                            <button class="btn btn-danger" onclick="showAccount()">Create Account</button>
+                        </div>
                     </div>
 
                     <hr class="border-2">
@@ -383,7 +538,7 @@
                             @foreach ($offices as $office)
                                 <div class="accordion-item">
                                     <h2 class="accordion-header">
-                                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#{{ $office->id }}" aria-expanded="false" aria-controls="1">
+                                        <button class="accordion-button collapsed d-flex justify-content-between" type="button" data-bs-toggle="collapse" data-bs-target="#{{ $office->id }}" aria-expanded="false" aria-controls="1">
                                             {{ $office->office_name }}
                                         </button>
                                     </h2>
@@ -392,7 +547,7 @@
                                         <div class="accordion-body d-flex flex-column gap-3">
                                             @foreach ($office->users as $index => $user)
                                                 <div class="d-flex align-items-center">
-                                                    <p class="mb-0 me-auto">{{ $user->username }}</p>
+                                                    <p class="mb-0 me-auto">{{ $user->name }}</p>
                                                     <div class="d-flex gap-2">
                                                         <button class="btn btn-primary view-user-btn" onclick="viewUser()" data-id="{{ $user->id }}">View</button>
                                                         <button class="btn btn-danger">Delete</button>
@@ -410,15 +565,8 @@
                         </div>
                     </div>
 
-                    <div class="d-flex">
-                        <h5 class="text-secondary-emphasis">Activity Log</h5>
-                    </div>
-
+                    <h5 class="text-secondary-emphasis m-0 mt-6">Activity Log</h5>
                     <hr class="border-2">
-
-                    <div>
-                        pass
-                    </div>
                 </div>
 
                 <div class="tab-pane flex-column" id="tab-complaint" role="tabpanel" aria-labelledby="btn-complaint" tabindex="0">
@@ -437,14 +585,14 @@
                                 <label class="form-label" for="details">Details</label>
                                 <textarea class="form-control mb-2" name="cdetails" id="cdetails" rows="21" style="resize: none;" disabled></textarea>
                             
-                                <form class="input-group" method="post" action="" id="complaint-form">
+                                <form class="input-group" method="post" id="complaint-form">
                                     @csrf
 
-                                    <select class="form-select rounded-start" name="status" id="status">
+                                    <select class="form-select rounded-start" name="cstatus" id="cstatus">
+                                        <option value="default" selected disabled>Status</option>
                                         <option value="1">Legitimate</option>
                                         <option value="2">Non-conformity</option>
                                         <option value="3">Inquiry</option>
-                                        <option value="4">Closed</option>
                                     </select>
 
                                     <button class="btn btn-danger" type="submit">Update Status</button>
@@ -454,12 +602,12 @@
 
                         <div class="col-sm-5 d-flex flex-column gap-2">
                             <div class="form-group">
-                                <label class="form-label" for="office">Recipient</label>
+                                <label class="form-label" for="coffice">Recipient</label>
                                 <input class="form-control" type="text" name="coffice" id="coffice" disabled>
                             </div>
 
                             <div class="form-group">
-                                <label class="form-label" for="">Complainant</label>
+                                <label class="form-label" for="cname">Complainant</label>
 
                                 <div class="d-flex flex-column gap-2">
                                     <input class="form-control" type="text" name="cname" id="cname" disabled>
@@ -468,7 +616,7 @@
                             </div>
 
                             <div class="form-group">
-                                <label for="contact">Contact Information</label>
+                                <label class="form-label" for="cnumber">Contact Information</label>
 
                                 <div class="d-flex flex-column gap-2">
                                     <input class="form-control" type="email" name="cemail" id="cemail" disabled>
@@ -509,6 +657,49 @@
             </div>
         </div>
 
+        <div class="modal fade" id="createAccount" role="dialog" tabindex="-1" aria-labelledby="createAccount" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5">Create Account</h1>
+                    </div>
+
+                    <form class="d-flex flex-column gap-2 modal-body" method="post" action="{{ route('create-account') }}" id="createAccountForm">
+                        @csrf
+
+                        <div class="d-flex flex-column">
+                            <label class="form-label" for="username">Username</label>
+                            <input class="form-control" style="text-transform: capitalize;" type="text" name="username" id="username" required>
+                        </div>
+
+                        <div class="d-flex flex-column">
+                            <label class="form-label" for="name">Name</label>
+                            <input class="form-control" style="text-transform: capitalize;" type="text" name="name" id="name" required>
+                        </div>
+
+                        <div class="d-flex flex-column">
+                            <label class="form-label" for="password">Default Password</label>
+                            <input class="form-control" type="text" name="password" id="password" required>
+                        </div>
+
+                        <div class="d-flex flex-column">
+                            <label class="form-label" for="office">Office</label>
+                            <select class="form-select" name="office" id="office" required>
+                                @foreach ($offices as $office)
+                                    <option value="{{ $office->id }}">{{ $office->office_name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </form>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#confirmModal">Create</button>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="modal fade" id="confirmModal" role="dialog" tabindex="-1" aria-labelledby="confirmModal" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -523,6 +714,30 @@
                     <div class="modal-footer">
                         <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button class="btn btn-primary" onclick="submitAccount()">Proceed</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="createOffice" role="dialog" tabindex="-1" aria-labelledby="createOffice" aria-hidden="true" data-bs-backdrop="static">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5">Create Office</h1>
+                    </div>
+
+                    <form class="d-flex flex-column gap-2 modal-body" method="post" action="{{ route('create-office') }}" id="createOfficeForm">
+                        @csrf
+
+                        <div class="d-flex flex-column">
+                            <label class="form-label" for="office-name">Office</label>
+                            <input class="form-control" type="text" name="office-name" id="office-name">
+                        </div>
+                    </form>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#confirmOffice">Create</button>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     </div>
                 </div>
             </div>
@@ -583,11 +798,11 @@
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="userModalName">Notification</h1>
+                        <h1 class="modal-title fs-5" id="userModalName">Notification!</h1>
                     </div>
 
                     <div class="modal-body">
-                        There are <span class="fw-bold">{{ $new_complaints->count() }}</span> new complaints!
+                        There are <span class="fw-bold">{{ $new_complaints->count() }}</span> new complaints.
                     </div>
 
                     <div class="modal-footer">
@@ -628,17 +843,44 @@
                 });
             });
 
+            function showAccount()
+            {
+                var modal = new bootstrap.Modal(document.getElementById("createAccount"));
+                modal.show();
+            }
+
             function submitAccount()
             {
-                document.getElementById('form-accounts').submit();
+                let x = document.forms['createAccountForm']['username'].value;
+                let y = document.forms['createAccountForm']['password'].value;
+                let z = document.forms['createAccountForm']['office'].value;
+
+                if (x != '' && y != '' && z != '') {
+                    document.getElementById('createAccountForm').submit();
+                } else {
+                    alert('Missing required input.');
+                }
+            }
+
+            function showOffice()
+            {
+                var modal = new bootstrap.Modal(document.getElementById("createOffice"));
+                modal.show();
             }
 
             function submitOffice()
             {
-                document.getElementById('form-offices').submit();
+                let x = document.forms['createOfficeForm']['office-name'].value;
+
+                if (x != '') {
+                    document.getElementById('createOfficeForm').submit();
+                } else {
+                    alert('Missing required input.');
+                }
             }
 
-            function search_complaint(mode) {
+            function search_complaint(mode) 
+            {
                 switch (mode) {
                     case 1:
                         var input = document.getElementById('search-pending');
@@ -693,9 +935,9 @@
                 }  
             }
 
-            function viewUser() {
+            function viewUser() 
+            {
                 var modal = new bootstrap.Modal(document.getElementById("viewUser"));
-
                 modal.show();
             }
 
@@ -713,7 +955,7 @@
                             day: 'numeric',
                         });
 
-                        let loggedDate = new Date(data.user.updated_at);
+                        let loggedDate = new Date(data.user.last_activity);
                         let formattedLoggedDate = loggedDate.toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: 'long',
@@ -752,7 +994,14 @@
                                 $('#csub').text(formattedSpecificDate);
                                 $('#cago').html(`(${data.ago})`);
                                 $('#cdetails').text(data.details);
-                                $('#coffice').val(data.office);
+
+                                if (data.status) {
+                                    $('#cstatus').val(data.status);
+                                } else {
+                                    $('#cstatus').val('default');
+                                }
+
+                                $('#coffice').val(data.office.office_name);
                                 $('#cname').val(data.name);
                                 $('#ctype').val(data.type);
                                 $('#cemail').val(data.email);
@@ -765,8 +1014,20 @@
                                     $('#btn-ccf').prop('disabled', true);
                                 } else {
                                     $('#btn-memo').prop('disabled', false);
-                                    $('#btn-ccf').prop('disabled', false);
+                                    if (data.has_memo) {
+                                        $('#btn-ccf').prop('disabled', false);
+                                    } else {
+                                        $('#btn-ccf').prop('disabled', true);
+                                    }
                                 }
+
+                                $('#btn-memo').on('click', function () {
+                                    window.location.href = 'complaint/memo/' + complaintId;
+                                });
+
+                                $('#btn-ccf').on('click', function () {
+                                    window.location.href = 'complaint/form/' + complaintId;
+                                });
 
                                 const complaintTab = document.getElementById('btn-complaint');
                                 complaintTab.click();
@@ -779,19 +1040,10 @@
                 });
             });
         
-            function showFiles() {
-                console.log('logged');
+            function showFiles() 
+            {
                 $('#filesModal').modal('show');
             }
         </script>
-
-        @if($new_complaints)
-            <script>
-                document.addEventListener('DOMContentLoaded', event => {
-                    var modal = new bootstrap.Modal(document.getElementById("notifications"));
-                    // modal.show();
-                });
-            </script>
-        @endif
     </body>
 </html>
