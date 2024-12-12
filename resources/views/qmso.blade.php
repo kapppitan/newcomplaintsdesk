@@ -32,15 +32,18 @@
 
                 <ul class="nav nav-pills nav-fill flex-column mb-auto gap-2" role="tablist" id="nav">
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link bg-danger text-light d-flex active" id="btn-overview" data-bs-toggle="pill" data-bs-target="#tab-overview" type="button" role="tab" aria-controls="btn-overview" aria-selected="true">
-                            <i class="bi-speedometer me-2"></i>Dashboard
+                        <button class="nav-link bg-danger text-light d-flex align-items-center active" id="btn-tab" data-bs-toggle="pill" data-bs-target="#tab-tab" type="button" role="tab" aria-controls="btn-tab" aria-selected="false">
+                            <div class="me-auto">    
+                                <i class="bi-file-earmark-check-fill me-2"></i>Complaints
+                            </div>
+                            <span class="badge"></span>
                         </button>
                     </li>
 
                     <li class="nav-item" role="presentation">
-                        <button class="nav-link bg-danger text-light d-flex align-items-center" id="btn-tab" data-bs-toggle="pill" data-bs-target="#tab-tab" type="button" role="tab" aria-controls="btn-tab" aria-selected="false">
+                        <button class="nav-link bg-danger text-light d-flex align-items-center" id="btn-mon" data-bs-toggle="pill" data-bs-target="#tab-mon" type="button" role="tab" aria-controls="btn-mon" aria-selected="false">
                             <div class="me-auto">    
-                                <i class="bi-file-earmark-check-fill me-2"></i>Complaints
+                                <i class="bi-eye-fill me-2"></i>Monitored
                             </div>
                             <span class="badge"></span>
                         </button>
@@ -67,13 +70,7 @@
             </div>
 
             <div class="col-10 tab-content p-3 h-100 overflow-scroll overflow-x-hidden" id="tabContent">
-                <div class="tab-pane flex-column show active" id="tab-overview" role="tabpanel" aria-labelledby="btn-overview" tabindex="0">
-                    <h5 class="text-secondary-emphasis m-0">Dashboard</h5>
-
-                    <hr class="border-2">
-                </div>
-
-                <div class="tab-pane flex-column" id="tab-tab" role="tabpanel" aria-labelledby="btn-tab" tabindex="0">
+                <div class="tab-pane flex-column active" id="tab-tab" role="tabpanel" aria-labelledby="btn-tab" tabindex="0">
                     <div class="d-flex align-items-center">
                         <h5 class="text-secondary-emphasis m-0">Complaints</h5>
                         <input class="form-control w-25 ms-auto" type="search" name="search" placeholder="Search..." onkeyup="search_complaint(1)" id="search-pending">
@@ -84,7 +81,7 @@
                     <div class="list-group" id="complaints-pending">
                         @php
                             $pendingComplaints = $complaints->filter(function($complaint) {
-                                return $complaint->phase == 3;
+                                return $complaint->phase === 3 && $complaint->is_monitored != true;
                             });
                         @endphp
 
@@ -92,8 +89,8 @@
                             <p class="text-center text-secondary m-0">No submitted complaints yet!</p>
                         @else
                             @foreach ($complaints as $complaint)
-                                @if ($complaint->phase === 3)
-                                    <a href="complaint/form/print/{{ $complaint->id }}" class="list-group-item complaint-link" data-toggle="tab" aria-current="true" data-id="{{ $complaint->id }}">
+                                @if ($complaint->phase === 3 && $complaint->is_monitored != true)
+                                    <a href="/corrective/{{ $complaint->id }}" class="list-group-item complaint-link" data-toggle="tab" aria-current="true" data-id="{{ $complaint->id }}">
                                         <div class="d-flex w-100 justify-content-between">
                                             <h5 class="mb-1 {{ $complaint->is_read == true ? 'text-secondary' : '' }}">{{ \Illuminate\Support\Str::limit($complaint->details, 70, $end = "...") }}</h5>
                                             <small class="text-secondary">{{ $complaint->created_at->diffForHumans() }}</small>
@@ -143,81 +140,284 @@
                     </div>
                 </div>
 
-                <div class="tab-pane flex-column" id="tab-profile" role="tabpanel" aria-labelledby="btn-profile" tabindex="0">
-                    profile
-                </div>
-
-                <div class="tab-pane flex-column" id="tab-complaint" role="tabpanel" aria-labelledby="btn-complaint" tabindex="0">
-                    <a href="">Back</a>
+                <div class="tab-pane flex-column" id="tab-mon" role="tabpanel" aria-labelledby="btn-mon" tabindex="0">
+                    <div class="d-flex align-items-center">
+                        <h5 class="text-secondary-emphasis m-0">Monitored</h5>
+                        <input class="form-control w-25 ms-auto" type="search" name="search" placeholder="Search..." onkeyup="search_complaint(1)" id="search-pending">
+                    </div>
 
                     <hr class="border-2">
 
-                    <div class="d-flex gap-2">
-                        <p>Submitted on <span class="fw-bold" id="csub"></span></p>
-                        <span class="text-secondary" id="cago"></span>
-                    </div>
+                    <div class="list-group" id="complaints-pending">
+                        @php
+                            $pendingComplaints = $complaints->filter(function($complaint) {
+                                return $complaint->phase === 3 && $complaint->is_monitored;
+                            });
+                        @endphp
 
-                    <div class="row h-100">
-                        <div class="col-sm-7">
-                            <div class="form-group">
-                                <label class="form-label" for="details">Details</label>
-                                <textarea class="form-control mb-2" name="cdetails" id="cdetails" rows="21" style="resize: none;" disabled></textarea>
-                            
-                                <form class="input-group" method="post" action="" id="complaint-form">
-                                    @csrf
+                        @if ($pendingComplaints->isEmpty())
+                            <p class="text-center text-secondary m-0">No monitored complaints yet!</p>
+                        @else
+                            @foreach ($complaints as $complaint)
+                                @if ($complaint->phase === 3 && $complaint->is_monitored)
+                                    <a href="corrective/{{$complaint->id}}" class="list-group-item complaint-link" data-toggle="tab" aria-current="true" data-id="{{ $complaint->id }}">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h5 class="mb-1 {{ $complaint->is_read == true ? 'text-secondary' : '' }}">{{ \Illuminate\Support\Str::limit($complaint->details, 70, $end = "...") }}</h5>
+                                            <small class="text-secondary">{{ $complaint->created_at->diffForHumans() }}</small>
+                                        </div>
 
-                                    <select class="form-select rounded-start" name="cstatus" id="cstatus">
-                                        <option value="1">Legitimate</option>
-                                        <option value="2">Non-conformity</option>
-                                        <option value="3">Inquiry</option>
-                                        <option value="4">Closed</option>
-                                    </select>
+                                        <p class="mb-2">
+                                            @switch ($complaint->complaint_type)
+                                                @case(1)
+                                                    Slow service
+                                                    @break
+                                                @case(2)
+                                                    Unruly/disrespectful personnel
+                                                    @break
+                                                @case(3)
+                                                    No response
+                                                    @break
+                                                @case(4)
+                                                    Error/s on request
+                                                    @break
+                                                @case(5)
+                                                    Delayed issuance of request
+                                                    @break
+                                                @case(6)
+                                                    Others (Specific issue)
+                                                    @break
+                                            @endswitch
+                                        </p>
 
-                                    <button class="btn btn-danger" type="submit">Update Status</button>
-                                </form>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-5 d-flex flex-column gap-2">
-                            <div class="form-group">
-                                <label class="form-label" for="coffice">Recipient</label>
-                                <input class="form-control" type="text" name="coffice" id="coffice" disabled>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="cname">Complainant</label>
-
-                                <div class="d-flex flex-column gap-2">
-                                    <input class="form-control" type="text" name="cname" id="cname" disabled>
-                                    <input class="form-control" type="text" name="type" id="ctype" disabled>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label class="form-label" for="cnumber">Contact Information</label>
-
-                                <div class="d-flex flex-column gap-2">
-                                    <input class="form-control" type="email" name="cemail" id="cemail" disabled>
-                                    <input class="form-control" type="text" name="cnumber" id="cnumber" disabled>
-                                </div>
-                            </div>
-
-                            <div class="d-flex flex-column gap-2 mt-auto">
-                                <button class="btn btn-danger" onclick="showFiles()">View Attached Files</button>
-
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-danger flex-fill" id="btn-memo">Memo</button>
-                                    <button class="btn btn-danger flex-fill" id="btn-ccf">Customer Complaint Form</button>
-                                </div>
-                            </div>
-                        </div>
+                                        <small class="text-secondary" style="font-size: 12px;">
+                                            <h6>
+                                                @switch ($complaint->phase)
+                                                    @case(true)
+                                                        <span class="badge text-bg-danger rounded-pill">Monitored</span>
+                                                        @break
+                                                    @case(false)
+                                                        <span class="badge text-bg-success text-white rounded-pill">Pending</span>
+                                                        @break
+                                                @endswitch
+                                            </h6>
+                                        </small>
+                                    </a>
+                                @endif
+                            @endforeach
+                        @endif
                     </div>
                 </div>
+
+                <div class="tab-pane flex-column" id="tab-profile" role="tabpanel" aria-labelledby="btn-profile" tabindex="0">
+                    <h5 class="text-secondary-emphasis">Profile</h5>
+                    <hr class="border-2">
+
+                    <form class="d-flex flex-column gap-2 w-75" method="post" action="{{ route('update-profile', ['id' => Auth::user()->id]) }}">
+                        @csrf
+
+                        <div class="input-group w-50">
+                            <span class="input-group-text w-25">Name</span>
+                            <input type="text" class="form-control" name="name" id="name" value="{{ Auth::user()->name }}">
+                        </div>
+
+                        <div class="input-group w-50">
+                            <span class="input-group-text w-25">Username</span>
+                            <input type="text" class="form-control" name="username" id="username" value="{{ Auth::user()->username }}">
+                        </div>
+                        
+
+                        <div class="input-group w-50">
+                            <span class="input-group-text w-25">Password</span>
+                            <input type="password" class="form-control" name="password" id="password">
+                        </div>
+
+                        <button class="btn btn-danger w-25" type="submit">Update</button>
+                    </form>
+                </div>
+
+                <!-- <div class="tab-pane flex-column" id="tab-complaint" role="tabpanel" aria-labelledby="btn-complaint" tabindex="0">
+                    <div class="d-flex justify-content-between">
+                        <a href="">Back</a>
+                        <a href="" class="btn btn-secondary">Print</a>
+                    </div>
+
+                    <hr class="border-2">
+
+                    <div class="row h-100">
+                        <div class="col-sm-8">
+                            <div class="container-fluid d-flex flex-column gap-2 bg-white p-2 rounded-1" id="corrective_action">
+                                <label class="form-label" for="details">Corrective Action</label>
+                                
+                                <div class="row">
+                                    <div class="col">
+                                        <textarea class="form-control" style="resize: none;" rows="12" name="corrective_action" id="" disabled></textarea>
+                                    </div>
+
+                                    <div class="col d-flex flex-column gap-2">
+                                        <div class="form-group">
+                                            <label class="form-label" for="corrective_date">Implementation Date</label>
+                                            <input class="form-control" type="date" name="corrective_date" disabled>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="corrective_effect">Effectiveness</label>
+                                            <input class="form-control" type="text" name="corrective_effect" disabled>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="corrective_period">Monitoring Period</label>
+                                            <input class="form-control" type="text" name="corrective_period" disabled>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="corrective_responsible">Responsible</label>
+                                            <input class="form-control" type="text" name="corrective_responsible" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex flex-column">
+                                    <label for="feedback">Comment</label>
+                                    <textarea class="form-control" name="feedback" id="feedback"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-4 d-flex flex-column gap-3">
+                            <form class="input-group" method="post" id="status">
+                                @csrf
+
+                                <select class="form-select" name="cstatus" id="cstatus">
+                                    <option value="0">Open</option>
+                                    <option value="1">Closed</option>
+                                </select>
+
+                                <button class="btn btn-danger">Update Status</button>
+                            </form>
+
+                            <form class="d-flex flex-column gap-2" method="post" id="monitor">
+                                @csrf
+
+                                <a class="btn btn-danger flex-fill" id="view-complaint-form">View Complaint Form</a>
+                                <button class="btn btn-danger flex-fill">Monitor Complaint</button>
+                            </form>
+                        </div>
+                    </div>
+                </div> -->
             </div>
         </div>
 
         <script src="{{ asset('js/jquery-3.7.1.min.js') }}"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+    
+        <!-- <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('.complaint-link').forEach(link => {
+                    link.addEventListener('click', function (event) {
+                        event.preventDefault();
+
+                        const complaintId = this.getAttribute('data-id');
+
+                        $.ajax({
+                            url: '/corrective/' + complaintId,
+                            method: 'GET',
+                            success: function (data) {
+                                document.getElementById('view-complaint-form').href = '/complaint/form/print/' + complaintId;
+                                document.getElementById('status').action = '/open-close/' + complaintId;
+                                document.getElementById('monitor').action = '/monitor/' + complaintId;
+                                displayCorrectiveActions(data.corrective);
+                            }
+                        });
+
+                        // Function to create and append corrective action elements
+                        function displayCorrectiveActions(correctiveActions) {
+                            const container = document.getElementById("corrective_action"); 
+
+                            correctiveActions.forEach((action, index) => {
+                                const actionContainer = document.createElement("div");
+                                actionContainer.className = "container-fluid d-flex flex-column gap-2 bg-white p-2 rounded-1";
+                                actionContainer.id = `corrective_action_${index + 1}`;
+
+                                const labelCorrectiveAction = document.createElement("label");
+                                labelCorrectiveAction.className = "form-label";
+                                labelCorrectiveAction.textContent = "Corrective Action";
+
+                                const textareaCorrectiveAction = document.createElement("textarea");
+                                textareaCorrectiveAction.className = "form-control";
+                                textareaCorrectiveAction.style.resize = "none";
+                                textareaCorrectiveAction.rows = "12";
+                                textareaCorrectiveAction.name = `corrective_action_${index + 1}`;
+                                textareaCorrectiveAction.disabled = true;
+                                textareaCorrectiveAction.textContent = action.corrective_action;
+
+                                actionContainer.appendChild(labelCorrectiveAction);
+                                actionContainer.appendChild(textareaCorrectiveAction);
+
+                                const rowContainer = document.createElement("div");
+                                rowContainer.className = "row";
+
+                                const col1 = document.createElement("div");
+                                col1.className = "col";
+
+                                const col2 = document.createElement("div");
+                                col2.className = "col d-flex flex-column gap-2";
+
+                                col2.appendChild(createInputGroup("Implementation Date", "date", action.implementation_date, `corrective_date_${index + 1}`));
+                                col2.appendChild(createInputGroup("Effectiveness", "text", action.effectiveness, `corrective_effect_${index + 1}`));
+                                col2.appendChild(createInputGroup("Monitoring Period", "text", action.period, `corrective_period_${index + 1}`));
+                                col2.appendChild(createInputGroup("Responsible", "text", action.responsible, `corrective_responsible_${index + 1}`));
+
+                                rowContainer.appendChild(col1);
+                                rowContainer.appendChild(col2);
+                                actionContainer.appendChild(rowContainer);
+
+                                const commentContainer = document.createElement("div");
+                                commentContainer.className = "d-flex flex-column";
+
+                                const labelComment = document.createElement("label");
+                                labelComment.textContent = "Comment";
+
+                                const textareaComment = document.createElement("textarea");
+                                textareaComment.className = "form-control";
+                                textareaComment.name = `feedback_${index + 1}`;
+                                textareaComment.id = `feedback_${index + 1}`;
+
+                                commentContainer.appendChild(labelComment);
+                                commentContainer.appendChild(textareaComment);
+                                actionContainer.appendChild(commentContainer);
+
+                                container.appendChild(actionContainer);
+                            });
+                        }
+
+                        // Helper function to create labeled input groups
+                        function createInputGroup(labelText, inputType, inputValue, inputName) {
+                            const formGroup = document.createElement("div");
+                            formGroup.className = "form-group";
+
+                            const label = document.createElement("label");
+                            label.className = "form-label";
+                            label.textContent = labelText;
+
+                            const input = document.createElement("input");
+                            input.className = "form-control";
+                            input.type = inputType;
+                            input.name = inputName;
+                            input.disabled = true;
+                            input.value = inputValue || "";
+
+                            formGroup.appendChild(label);
+                            formGroup.appendChild(input);
+
+                            return formGroup;
+                        }
+
+                        const complaintTab = document.getElementById('btn-complaint');
+                        complaintTab.click();
+                    });
+                });
+            });
+        </script> -->
     </body>
 </html>

@@ -18,7 +18,7 @@
             <h4 class="text-danger position-absolute start-50 translate-middle-x" style="top: 15px;">Memo</h4>
 
             <div class="d-flex gap-2">
-                <a class="btn btn-secondary" href="/complaint/memo/print/{{ $complaint->id }}">
+                <a class="btn btn-secondary {{ $complaint->has_memo ? '' : 'disabled' }}" href="/complaint/memo/print/{{ $complaint->id }}">
                     <i class="bi bi-printer"></i>
                 </a>
 

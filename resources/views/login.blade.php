@@ -23,8 +23,8 @@
                 </div>
             @endif
 
-            <input class="form-control border-danger border-2" type="text" name="username" placeholder="Username">
-            <input class="form-control border-danger border-2" type="password" name="password" placeholder="Password">
+            <input class="form-control border-danger border-2" type="text" name="username" id="username" placeholder="Username">
+            <input class="form-control border-danger border-2" type="password" name="password" id="password" placeholder="Password">
 
             <input class="btn btn-danger mt-5" type="submit" value="Login">
         </form>

@@ -25,18 +25,19 @@ class OfficeController extends Controller
         $credentials = $request->only('username', 'password');
 
         if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+
             $request->user()->update(['last_activity' => Carbon::now()]);
 
             return match ($request->user()->office_id) {
-                1 => redirect('/qao'),
-                2 => redirect('/qmso'),
-                default => redirect('/office'),
+                1 => redirect()->intended('/qao'),
+                2 => redirect()->intended('/qmso'),
+                default => redirect()->intended('/office/' . $request->user()->id),
             };
         }
 
         return redirect('/login')->with('error', true);
     }
-
 
     public function logout (Request $request)
     {
@@ -58,47 +59,50 @@ class OfficeController extends Controller
 
     public function qao_index (Request $request)
     {
-        if (Auth::user()->office_id == 1) {
-            $complaints = Complaints::all();
-            $tcomplaints = Complaints::orderBy('ticket_id')->get();
-            $office = Office::with('users')->get();
-            $ticket = Ticket::all();
+        if (Auth::check()) {
+            if (Auth::user()->office_id == 1) {
+                $complaints = Complaints::all();
+                $tcomplaints = Complaints::orderBy('ticket_id')->get();
+                $office = Office::with('users')->get();
+                $ticket = Ticket::all();
 
-            $pending = Complaints::where('status', 0)->count();
-            $processing = Complaints::whereIn('status', [1, 3])->count();
-            $closed = Complaints::where('status', 4)->count();
+                $pending = Complaints::where('status', 'Pending')->count();
+                $processing = Complaints::where('status', 'Processing')->count();
+                $closed = Complaints::where('status', 'Closed')->count();
 
-            $forms = Form::all();
+                $forms = Form::all();
 
-            $new_complaints = Complaints::where('is_read', false)->where('created_at', '<', Auth::user()->last_activity)->get();
+                $lastActivity = Auth::user()->last_activity ?? Auth::user()->created_at;
+                $new_complaints = Complaints::where('is_read', false)->where('created_at', '>', $lastActivity)->get();
 
-            $user = User::where('id', Auth::user()->id)->first();
-            $user->last_activity = Carbon::now();
-            $user->save();
+                $user = User::where('id', Auth::user()->id)->first();
+                $user->last_activity = Carbon::now();
+                $user->save();
 
-            return view('qao')->with([
-                'complaints'=> $complaints, 
-                'offices' => $office , 
-                'pending' => $pending, 
-                'processing' => $processing, 
-                'tickets' => $ticket, 
-                'form' => $forms, 
-                'tcomplaints' => $tcomplaints, 
-                'new_complaints' => $new_complaints,
-                'closed' => $closed,
-                'notifShown' => session('notifShown', false),
-            ]);
-        } else {
-            return $this->office_index($request);
+                return view('qao')->with([
+                    'complaints'=> $complaints, 
+                    'offices' => $office , 
+                    'pending' => $pending, 
+                    'processing' => $processing, 
+                    'tickets' => $ticket, 
+                    'form' => $forms, 
+                    'tcomplaints' => $tcomplaints, 
+                    'new_complaints' => $new_complaints,
+                    'closed' => $closed,
+                    'notifShown' => session('notifShown', false),
+                ]);
+            } else {
+                return $this->office_index($request, Auth::user()->id);
+            }
         }
     }
 
-    public function office_index (Request $request)
+    public function office_index (Request $request, $id)
     {
         if(Auth::user()->office_id != 1) {
             $complaints = Complaints::where('office_id', Auth::user()->office_id)->where('has_form', true)->get();
             $inbox = Complaints::where('office_id', Auth::user()->office_id)->where('has_form', true)->where('phase', 1)->get();
-            $outbox = Complaints::where('office_id', Auth::user()->office_id)->where('has_form', true)->where('phase', 2)->get();
+            $outbox = Complaints::where('office_id', Auth::user()->office_id)->where('is_monitored', true)->where('phase', 2)->get();
 
             $year = date('Y');
             $complaint = Complaints::whereYear('created_at', $year)
@@ -139,6 +143,7 @@ class OfficeController extends Controller
         $account = new User();
 
         $account->username = $request->input('username');
+        $account->name = $request->input('name');
         $account->password = $request->input('password');
         $account->office_id = $request->input('office');
 
@@ -223,5 +228,17 @@ class OfficeController extends Controller
         }
 
         return redirect()->back();
+    }
+
+    public function delete_user (Request $request, $id)
+    {
+        $user = User::find($id);
+        
+        if ($user) {
+            $user->delete();
+            return redirect('/qao')->with('delete', 'Account deleted.');
+        }
+
+        return response()->json(['delete' => 'Error']);
     }
 }

@@ -41,12 +41,13 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('/complaint/form/print/{id}', 'App\Http\Controllers\ComplaintController@print_ccf');
     Route::get('/complaint/memo/{id}', 'App\Http\Controllers\OfficeController@memo_index')->name('memo');
     Route::get('/complaint/memo/print/{id}', 'App\Http\Controllers\ComplaintController@print_memo');
-    Route::get('/office', 'App\Http\Controllers\OfficeController@office_index');
+    Route::get('/office/{id}', 'App\Http\Controllers\OfficeController@office_index');
     Route::get('/office/complaint/memo/{id}', 'App\Http\Controllers\OfficeController@view_memo');
     Route::get('/office/complaint/form/{id}', 'App\Http\Controllers\ComplaintController@form_index');
     Route::get('/office/complaint/memo/print/{id}', 'App\Http\Controllers\ComplaintController@print_memo');
     Route::get('/user/{id}', 'App\Http\Controllers\OfficeController@get_user');
     Route::get('/complaints', 'App\Http\Controllers\OfficeController@get_complaints');
+    Route::get('/corrective/{id}', 'App\Http\Controllers\ComplaintController@form_view');
 });
 
 
@@ -64,3 +65,8 @@ Route::post('update-profile/{id}', 'App\Http\Controllers\OfficeController@update
 Route::post('qao/submite-ccf/{id}', 'App\Http\Controllers\ComplaintController@submit_ccf')->name('submit-ccf');
 Route::post('qao/submite-memo/{id}', 'App\Http\Controllers\ComplaintController@submit_memo')->name('submit-memo');
 Route::post('/open-close/{id}', 'App\Http\Controllers\ComplaintController@open_close')->name('open-close');
+Route::post('/monitor/{id}', 'App\Http\Controllers\ComplaintController@monitor')->name('monitor');
+Route::post('/accept-not/{id}', 'App\Http\Controllers\ComplaintController@accept')->name('accept-not');
+Route::post('/upload-file/{id}', 'App\Http\Controllers\ComplaintController@upload')->name('upload-file');
+Route::get('/download/{id}', 'App\Http\Controllers\ComplaintController@download')->name('download');
+Route::delete('/delete/users/{id}', 'App\Http\Controllers\OfficeController@delete_user')->name('user-delete');

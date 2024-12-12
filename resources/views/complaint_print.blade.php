@@ -33,23 +33,6 @@
         <div class="d-flex p-3 w-100 justify-content-between align-items-center mb-3">
             <a href="{{ url()->previous() }}" class="btn btn-primary">Back</a>
 
-            @if (Auth::user()->office_id == 2)
-                <div class="d-flex gap-2 w-50">
-                    <button class="btn btn-success">Monitor</button>
-
-                    <form class="input-group" action="{{ route('open-close', ['id' => $complaint->id]) }}" method="post">
-                        @csrf
-
-                        <select class="form-select rounded-start" name="comp_status" id="comp_status">
-                            <option value="0" {{ $complaint->is_closed ? '' : 'selected' }}>Open</option>
-                            <option value="1" {{ $complaint->is_closed ? 'selected' : '' }}>Close</option>
-                        </select>
-
-                        <button type="submit" class="btn btn-danger">Update</button>
-                    </form>
-                </div>
-            @endif
-
             <button class="btn btn-danger" onclick="print_form()">Print</button>
         </div>
 
@@ -154,32 +137,34 @@
             <div class="row m-0">
                 <div class="col-md-1 px-1 p-0 border" style="width: 20px; font-size: x-small;">6</div>
                 <div class="col p-0 border">
-                    <div class="row m-0">
-                        <div class="col p-0 border">
-                            <p class="text-center bg-secondary-subtle m-0 border border-bottom" style="font-size: x-small;">CORRECTIVE ACTION (CA)</p>
-                            <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ $form->corrective_action }}</p>
-                        </div>
+                    @foreach ($corrective as $corr)
+                        <div class="row m-0">
+                            <div class="col p-0 border">
+                                <p class="text-center bg-secondary-subtle m-0 border border-bottom" style="font-size: x-small;">CORRECTIVE ACTION (CA)</p>
+                                <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ $corr->corrective_action }}</p>
+                            </div>
 
-                        <div class="col p-0 border">
-                            <p class="text-center bg-secondary-subtle px-3 m-0 border border-bottom" style="font-size: x-small;">IMPLEMENTATION DATE</p>
-                            <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ Carbon\Carbon::parse($form->implementation)->format('F j, Y') }}</p>
-                        </div>
+                            <div class="col p-0 border">
+                                <p class="text-center bg-secondary-subtle px-3 m-0 border border-bottom" style="font-size: x-small;">IMPLEMENTATION DATE</p>
+                                <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ Carbon\Carbon::parse($corr->implementation_date)->format('F j, Y') }}</p>
+                            </div>
 
-                        <div class="col p-0 border">
-                            <p class="text-center bg-secondary-subtle px-3 m-0 border border-bottom" style="font-size: x-small;">MEASURE OF EFFECTIVENESS</p>
-                            <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ $form->measure }}</p>
-                        </div>
+                            <div class="col p-0 border">
+                                <p class="text-center bg-secondary-subtle px-3 m-0 border border-bottom" style="font-size: x-small;">MEASURE OF EFFECTIVENESS</p>
+                                <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ $corr->effectiveness }}</p>
+                            </div>
 
-                        <div class="col p-0 border">
-                            <p class="text-center bg-secondary-subtle px-3 m-0 border border-bottom" style="font-size: x-small;">MONITORING PERIOD FOR CA</p>
-                            <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ $form->period }}</p>
-                        </div>
+                            <div class="col p-0 border">
+                                <p class="text-center bg-secondary-subtle px-3 m-0 border border-bottom" style="font-size: x-small;">MONITORING PERIOD FOR CA</p>
+                                <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ $corr->monitoring_period }}</p>
+                            </div>
 
-                        <div class="col p-0 border">
-                            <p class="text-center bg-secondary-subtle m-0 border border-bottom" style="font-size: x-small;">RESPONSIBLE</p>
-                            <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ $form->responsible }}</p>
+                            <div class="col p-0 border">
+                                <p class="text-center bg-secondary-subtle m-0 border border-bottom" style="font-size: x-small;">RESPONSIBLE</p>
+                                <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ $corr->responsible }}</p>
+                            </div>
                         </div>
-                    </div>
+                    @endforeach
                 </div>
             </div>
 
@@ -205,7 +190,7 @@
                     <div class="row m-0">
                         <div class="col p-0">
                             <p class="m-0 ps-1 border-bottom fw-bold" style="font-size: x-small;">Prepared by:</p>
-                            <p class="m-0 ps-1" style="font-size: x-small;">{{ optional($users->find($form->prepared_by))->username }}</p>
+                            <p class="m-0 ps-1" style="font-size: x-small;">{{ optional($users->find($form->prepared_by))->name }}</p>
                         </div>
 
                         <div class="col p-0">
@@ -215,7 +200,7 @@
 
                         <div class="col p-0">
                             <p class="m-0 ps-1 border-bottom fw-bold" style="font-size: x-small;">Approved by:</p>
-                            <p class="m-0 ps-1" style="font-size: x-small;">{{ optional($users->find($form->approved_by))->username }}</p>
+                            <p class="m-0 ps-1" style="font-size: x-small;">{{ optional($users->find($form->approved_by))->name }}</p>
                         </div>
 
                         <div class="col p-0">
@@ -225,7 +210,7 @@
 
                         <div class="col p-0">
                             <p class="m-0 ps-1 border-bottom fw-bold" style="font-size: x-small;">Acknowledged by:</p>
-                            <p class="m-0 ps-1" style="font-size: x-small;">{{ optional($users->find($form->acknowledged_by))->username }}</p>
+                            <p class="m-0 ps-1" style="font-size: x-small;">{{ optional($users->find($form->acknowledged_by))->name }}</p>
                         </div>
 
                         <div class="col p-0">

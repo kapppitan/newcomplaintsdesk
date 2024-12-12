@@ -28,7 +28,7 @@
             <div class="col-2 bg-danger p-3 d-flex flex-column">
                 <div class="d-flex align-items-center gap-2">
                     <img src="{{ asset('image/logo.png') }}" style="object-fit: fill; height: 50px; width: 50px;">
-                    <h4 class="text-light m-0 fs-5">Complaints Desk</h4>
+                    <h4 class="text-light m-0 fs-5"> Quality Assurance <br> Office <span class ms-5></span></h4>
                 </div>
                 
                 <hr class="border-light border-2">
@@ -47,7 +47,20 @@
                             </div>
                             <span class="badge">
                                 @if ($pending > 0)
-                                    {{ App\Models\Complaints::where('status', 0)->count() }}
+                                    {{ App\Models\Complaints::where('status', 'Pending')->count() }}
+                                @endif
+                            </span>
+                        </button>
+                    </li>
+
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link bg-danger text-light d-flex align-items-center" id="btn-inquiry" data-bs-toggle="pill" data-bs-target="#tab-inquiry" type="button" role="tab" aria-controls="btn-inquiry" aria-selected="false">
+                            <div class="me-auto">
+                                <i class="bi-question-diamond-fill me-2"></i>Inquiry
+                            </div>
+                            <span class="badge">
+                                @if ( App\Models\Complaints::where('status', 'Inquiry')->count() )
+                                    {{ App\Models\Complaints::where('status', 'Inquiry')->count() }}
                                 @endif
                             </span>
                         </button>
@@ -59,8 +72,8 @@
                                 <i class="bi-file-earmark-check-fill me-2"></i>Processing
                             </div>
                             <span class="badge">
-                                @if ($processing > 0)
-                                    {{ App\Models\Complaints::where('status', 1)->count() }}
+                                @if (App\Models\Complaints::where('status', 'Processing')->count() > 0)
+                                    {{ App\Models\Complaints::where('status', 'Processing')->count() }}
                                 @endif
                             </span>
                         </button>
@@ -72,8 +85,8 @@
                                 <i class="bi-envelope-slash-fill me-2"></i>Non-Conformity
                             </div>
                             <span class="badge">
-                                @if ($processing > 0)
-                                    {{ App\Models\Complaints::where('status', 2)->count() }}
+                                @if (App\Models\Complaints::where('status', 'Non-Conforming')->count())
+                                    {{ App\Models\Complaints::where('status', 'Non-Conforming')->count() }}
                                 @endif
                             </span>
                         </button>
@@ -109,11 +122,7 @@
 
             <div class="col-10 tab-content p-3 h-100 overflow-scroll overflow-x-hidden" id="tabContent">
                 <div class="tab-pane flex-column show active gap-2" id="tab-overview" role="tabpanel" aria-labelledby="btn-overview" tabindex="0">
-                    <div class="d-flex align-items-center">
-                        <h5 class="text-secondary-emphasis m-0">Dashboard</h5>
-                        <input class="form-control w-25 ms-auto" type="search" name="search" placeholder="Search..." onkeyup="search_complaint(1)" id="search-pending">
-                    </div>    
-                    
+                    <h5 class="text-secondary-emphasis m-0">Complaint Summary Dashboard</h5>
                     <hr class="border-2">
 
                     <div class="container text-center d-flex flex-column gap-4 mb-5">
@@ -123,14 +132,14 @@
                                 <div class="d-flex py-2 bg-white rounded-bottom">
                                     <div class="d-flex flex-column w-50 py-3">
                                         <p class="fw-bold m-0">Processing</p>
-                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 1)->where('status', 1)->count() }}</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 1)->where('status', 'Processing')->count() }}</p>
                                     </div>
 
                                     <div class="vr"></div>
 
                                     <div class="d-flex flex-column w-50 py-3">
                                         <p class="fw-bold m-0">Closed</p>
-                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 1)->where('status', 4)->count() }}</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 1)->where('status', 'Closed')->count() }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -140,14 +149,14 @@
                                 <div class="d-flex py-2 bg-white rounded-bottom">
                                     <div class="d-flex flex-column w-50 py-3">
                                         <p class="fw-bold m-0">Processing</p>
-                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 2)->where('status', 1)->count() }}</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 2)->where('status', 'Processing')->count() }}</p>
                                     </div>
 
                                     <div class="vr"></div>
 
                                     <div class="d-flex flex-column w-50 py-3">
                                         <p class="fw-bold m-0">Closed</p>
-                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 2)->where('status', 4)->count() }}</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 2)->where('status', 'Closed')->count() }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -157,14 +166,14 @@
                                 <div class="d-flex py-2 bg-white rounded-bottom">
                                     <div class="d-flex flex-column w-50 py-3">
                                         <p class="fw-bold m-0">Processing</p>
-                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 3)->where('status', 1)->count() }}</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 3)->where('status', 'Processing')->count() }}</p>
                                     </div>
 
                                     <div class="vr"></div>
 
                                     <div class="d-flex flex-column w-50 py-3">
                                         <p class="fw-bold m-0">Closed</p>
-                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 3)->where('status', 4)->count() }}</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 3)->where('status', 'Closed')->count() }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -176,14 +185,14 @@
                                 <div class="d-flex py-2 bg-white rounded-bottom">
                                     <div class="d-flex flex-column w-50 py-3">
                                         <p class="fw-bold m-0">Processing</p>
-                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 4)->where('status', 1)->count() }}</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 4)->where('status', 'Processing')->count() }}</p>
                                     </div>
 
                                     <div class="vr"></div>
 
                                     <div class="d-flex flex-column w-50 py-3">
                                         <p class="fw-bold m-0">Closed</p>
-                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 4)->where('status', 4)->count() }}</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 4)->where('status', 'Closed')->count() }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -193,14 +202,14 @@
                                 <div class="d-flex py-2 bg-white rounded-bottom">
                                     <div class="d-flex flex-column w-50 py-3">
                                         <p class="fw-bold m-0">Processing</p>
-                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 5)->where('status', 1)->count() }}</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 5)->where('status', 'Processing')->count() }}</p>
                                     </div>
 
                                     <div class="vr"></div>
 
                                     <div class="d-flex flex-column w-50 py-3">
                                         <p class="fw-bold m-0">Closed</p>
-                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 5)->where('status', 4)->count() }}</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 5)->where('status', 'Closed')->count() }}</p>
                                     </div>
                                 </div>
                             </div>
@@ -210,21 +219,30 @@
                                 <div class="d-flex py-2 bg-white rounded-bottom">
                                     <div class="d-flex flex-column w-50 py-3">
                                         <p class="fw-bold m-0">Processing</p>
-                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 6)->where('status', 1)->count() }}</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 6)->where('status', 'Processing')->count() }}</p>
                                     </div>
 
                                     <div class="vr"></div>
 
                                     <div class="d-flex flex-column w-50 py-3">
                                         <p class="fw-bold m-0">Closed</p>
-                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 6)->where('status', 4)->count() }}</p>
+                                        <p class="m-0">{{ App\Models\Complaints::where('complaint_type', 6)->where('status', 'Closed')->count() }}</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <table class="table table-striped table-bordered">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="text-secondary-emphasis m-0">Office Complaints Table</h5>
+                        <button class="btn btn-secondary" onclick="printDashboard()">
+                            <i class="bi-printer-fill"></i> Print
+                        </button>
+                    </div>
+
+                    <hr class="border-2">
+
+                    <table class="table table-striped table-bordered" id="table-dashboard">
                         <thead>
                             <tr>
                                 <th class="w-50">Office</th>
@@ -238,8 +256,8 @@
                             @foreach ($offices as $office)
                                 <tr>
                                     <td class="w-50">{{ $office->office_name }}</td>
-                                    <td class="text-center">{{ App\Models\Complaints::where('office_id', $office->id)->count() }}</td>
-                                    <td class="text-center">{{ App\Models\Complaints::where('office_id', $office->id)->count() }}</td>
+                                    <td class="text-center">{{ App\Models\Complaints::where('office_id', $office->id)->where('status', '!=', 'Closed')->count() }}</td>
+                                    <td class="text-center">{{ App\Models\Complaints::where('office_id', $office->id)->where('status', 'Closed')->count() }}</td>
                                     <td class="text-center">{{ App\Models\Complaints::where('office_id', $office->id)->count() }}</td>
                                 </tr>
                             @endforeach
@@ -258,7 +276,7 @@
                     <div class="list-group" id="complaints-pending">
                         @php
                             $pendingComplaints = $complaints->filter(function($complaint) {
-                                return $complaint->status == 0 || $complaint->status == 3;
+                                return $complaint->status == 'Pending';
                             });
                         @endphp
 
@@ -266,7 +284,68 @@
                             <p class="text-center text-secondary m-0">No pending complaints!</p>
                         @else
                             @foreach ($complaints as $complaint)
-                                @if ($complaint->status === 0 or $complaint->status === 3)
+                                @if ($complaint->status === 'Pending')
+                                    <a href="complaint/{{ $complaint->id }}" class="list-group-item complaint-link" data-toggle="tab" aria-current="true" data-id="{{ $complaint->id }}">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h5 class="mb-1 {{ $complaint->is_read == true ? 'text-secondary' : '' }}">{{ \Illuminate\Support\Str::limit($complaint->details, 70, $end = "...") }}</h5>
+                                            <small class="text-secondary">{{ $complaint->created_at->diffForHumans() }}</small>
+                                        </div>
+
+                                        <p class="mb-2">
+                                            @switch ($complaint->complaint_type)
+                                                @case(1)
+                                                    Slow service
+                                                    @break
+                                                @case(2)
+                                                    Unruly/disrespectful personnel
+                                                    @break
+                                                @case(3)
+                                                    No response
+                                                    @break
+                                                @case(4)
+                                                    Error/s on request
+                                                    @break
+                                                @case(5)
+                                                    Delayed issuance of request
+                                                    @break
+                                                @case(6)
+                                                    Others (Specific issue)
+                                                    @break
+                                            @endswitch
+                                        </p>
+
+                                        <small class="text-secondary" style="font-size: 12px;">
+                                            <h6>
+                                                <span class="badge text-bg-primary rounded-pill">Pending</span>
+                                            </h6>
+                                        </small>
+                                    </a>
+                                @endif
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
+
+                <div class="tab-pane flex-column" id="tab-inquiry" role="tabpanel" aria-labelledby="btn-inquiry" tabindex="0">
+                    <div class="d-flex align-items-center">
+                        <h5 class="text-secondary-emphasis m-0">Inquiries</h5>
+                        <input class="form-control w-25 ms-auto" type="search" name="search" placeholder="Search..." onkeyup="search_complaint(1)" id="search-inquiry">
+                    </div>
+                    
+                    <hr class="border-2">
+
+                    <div class="list-group" id="complaints-pending">
+                        @php
+                            $pendingComplaints = $complaints->filter(function($complaint) {
+                                return $complaint->status == 'Inquiry';
+                            });
+                        @endphp
+
+                        @if ($pendingComplaints->isEmpty())
+                            <p class="text-center text-secondary m-0">No pending complaints!</p>
+                        @else
+                            @foreach ($complaints as $complaint)
+                                @if ($complaint->status === 'Inquiry')
                                     <a href="complaint/{{ $complaint->id }}" class="list-group-item complaint-link" data-toggle="tab" aria-current="true" data-id="{{ $complaint->id }}">
                                         <div class="d-flex w-100 justify-content-between">
                                             <h5 class="mb-1 {{ $complaint->is_read == true ? 'text-secondary' : '' }}">{{ \Illuminate\Support\Str::limit($complaint->details, 70, $end = "...") }}</h5>
@@ -299,10 +378,10 @@
                                         <small class="text-secondary" style="font-size: 12px;">
                                             <h6>
                                                 @switch ($complaint->status)
-                                                    @case(0)
+                                                    @case('Pending')
                                                         <span class="badge text-bg-primary rounded-pill">Pending</span>
                                                         @break
-                                                    @case(3)
+                                                    @case('Inquiry')
                                                         <span class="badge text-bg-info text-white rounded-pill">Inquiry</span>
                                                         @break
                                                 @endswitch
@@ -326,7 +405,7 @@
                     <div class="list-group h-100" id="complaints-processing">
                         @php
                             $processingComplaints = $tcomplaints->filter(function($complaint) {
-                                return ($complaint->status > 0 && $complaint->status < 4 && $complaint->status != 2);
+                                return ($complaint->status == 'Processing');
                             });
                         @endphp
 
@@ -334,7 +413,7 @@
                             <p class="text-center text-secondary m-0">No processed complaints!</p>
                         @else
                             @foreach ($tcomplaints as $complaint)
-                                @if ($complaint->status > 0 && $complaint->status < 3 && $complaint->status != 2)
+                                @if ($complaint->status == 'Processing')
                                     <a href="complaint/{{ $complaint->id }}" class="list-group-item complaint-link" aria-current="true" data-id="{{ $complaint->id }}">
                                         <div class="d-flex w-100 justify-content-between">
                                             <h5 class="mb-1">
@@ -369,17 +448,7 @@
 
                                         <small class="text-secondary" style="font-size: 12px;">
                                             <h6>
-                                                @switch ($complaint->status)
-                                                    @case(0)
-                                                        <span class="badge text-bg-primary rounded-pill">Pending</span>
-                                                        @break
-                                                    @case(1)
-                                                        <span class="badge text-bg-success rounded-pill">Legitimate</span>
-                                                        @break
-                                                    @case(3)
-                                                        <span class="badge text-bg-info text-white rounded-pill">Inquiry</span>
-                                                        @break
-                                                @endswitch
+                                                <span class="badge text-bg-success rounded-pill">Legitimate</span>
 
                                                 @switch ($complaint->phase)
                                                     @case(1)
@@ -402,63 +471,128 @@
                 </div>
                 
                 <div class="tab-pane flex-column" id="tab-archived" role="tabpanel" aria-labelledby="btn-archived" tabindex="0">
-                    <div class="d-flex align-items-center">
-                        <h5 class="text-secondary-emphasis m-0">Archived Cases</h5>
-                        <input class="form-control w-25 ms-auto" type="search" name="search-archived" placeholder="Search..." onkeyup="search_complaint(3)" id="search-archive">
-                    </div>
+                    <h5 class="text-secondary-emphasis m-0">Archived Cases</h5>
 
                     <hr class="border-2">
 
-                    <div class="list-group" id="complaints-archive">
-                        @php
-                            $archivedComplaints = $complaints->filter(function($complaint) {
-                                return ($complaint->status == 4);
-                            });
-                        @endphp
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <button class="nav-link active" id="closed-tab" data-bs-toggle="tab" data-bs-target="#closed-tab-pane" type="button" role="tab" aria-controls="closed-tab-pane" aria-selected="true">Closed</button>
+                        </li>
 
-                        @if ($archivedComplaints->isEmpty())
-                            <p class="text-center text-secondary m-0">No archived complaints!</p>
-                        @else
-                            @foreach ($complaints as $complaint)
-                                @if ($complaint->status === 4)
-                                    <a href="complaint/{{ $complaint->id }}" class="list-group-item complaint-link" aria-current="true" data-id="{{ $complaint->id }}">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 70, $end = "...") }}</h5>
-                                            <small class="text-secondary">Closed on {{ date('F j, Y', strtotime($complaint->updated_at)) }}</small>
-                                        </div>
+                        <li class="nav-item">
+                            <button class="nav-link" id="disregard-tab" data-bs-toggle="tab" data-bs-target="#disregard-tab-pane" type="button" role="tab" aria-controls="disregard-tab-pane" aria-selected="false">Disregard</button>
+                        </li>
+                    </ul>
 
-                                        <p class="mb-2">
-                                            @switch ($complaint->complaint_type)
-                                                @case(1)
-                                                    Slow service
-                                                    @break
-                                                @case(2)
-                                                    Unruly/disrespectful personnel
-                                                    @break
-                                                @case(3)
-                                                    No response
-                                                    @break
-                                                @case(4)
-                                                    Error/s on request
-                                                    @break
-                                                @case(5)
-                                                    Delayed issuance of request
-                                                    @break
-                                                @case(6)
-                                                    Others (Specific issue)
-                                                    @break
-                                            @endswitch
-                                        </p>
+                    <div class="tab-content">
+                        <div class="tab-pane flex-column bg-white active show p-4" id="closed-tab-pane" aria-labelledby="closed-tab" tabindex="0">
+                            <div class="list-group" id="complaints-archive-close">
+                                @php
+                                    $archivedComplaints = $complaints->filter(function($complaint) {
+                                        return ($complaint->status == 'Closed');
+                                    });
+                                @endphp
 
-                                        <small class="text-secondary" style="font-size: 12px;">
-                                            <h6>
-                                                <span class="badge text-bg-danger rounded-pill">Closed</span>
-                                            </h6>
-                                        </small>
-                                    </a>
+                                @if ($archivedComplaints->isEmpty())
+                                    <p class="text-center text-secondary m-0">No closed complaints!</p>
+                                @else
+                                    @foreach ($complaints as $complaint)
+                                        @if ($complaint->status == 'Closed')
+                                            <a href="complaint/{{ $complaint->id }}" class="list-group-item complaint-link" aria-current="true" data-id="{{ $complaint->id }}">
+                                                <div class="d-flex w-100 justify-content-between">
+                                                    <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 70, $end = "...") }}</h5>
+                                                    <small class="text-secondary">Closed on {{ date('F j, Y', strtotime($complaint->updated_at)) }}</small>
+                                                </div>
+
+                                                <p class="mb-2">
+                                                    @switch ($complaint->complaint_type)
+                                                        @case(1)
+                                                            Slow service
+                                                            @break
+                                                        @case(2)
+                                                            Unruly/disrespectful personnel
+                                                            @break
+                                                        @case(3)
+                                                            No response
+                                                            @break
+                                                        @case(4)
+                                                            Error/s on request
+                                                            @break
+                                                        @case(5)
+                                                            Delayed issuance of request
+                                                            @break
+                                                        @case(6)
+                                                            Others (Specific issue)
+                                                            @break
+                                                    @endswitch
+                                                </p>
+
+                                                <small class="text-secondary" style="font-size: 12px;">
+                                                    <h6>
+                                                        <span class="badge text-bg-danger rounded-pill">Closed</span>
+                                                    </h6>
+                                                </small>
+                                            </a>
+                                        @endif
+                                    @endforeach
                                 @endif
-                            @endforeach
-                        @endif
+                            </div>
+                        </div>
+
+                        <div class="tab-pane flex-column p-4" id="disregard-tab-pane" aria-labelledby="disregard-tab" tabindex="0">
+                            <div class="list-group" id="complaints-archive-disregard">
+                                @php
+                                    $archivedComplaints = $complaints->filter(function($complaint) {
+                                        return ($complaint->status == 'Disregard');
+                                    });
+                                @endphp
+
+                                @if ($archivedComplaints->isEmpty())
+                                    <p class="text-center text-secondary m-0">No disregarded complaints!</p>
+                                @else
+                                    @foreach ($complaints as $complaint)
+                                        @if ($complaint->status == 'Disregard')
+                                            <a href="complaint/{{ $complaint->id }}" class="list-group-item complaint-link" aria-current="true" data-id="{{ $complaint->id }}">
+                                                <div class="d-flex w-100 justify-content-between">
+                                                    <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 70, $end = "...") }}</h5>
+                                                    <small class="text-secondary">Closed on {{ date('F j, Y', strtotime($complaint->updated_at)) }}</small>
+                                                </div>
+
+                                                <p class="mb-2">
+                                                    @switch ($complaint->complaint_type)
+                                                        @case(1)
+                                                            Slow service
+                                                            @break
+                                                        @case(2)
+                                                            Unruly/disrespectful personnel
+                                                            @break
+                                                        @case(3)
+                                                            No response
+                                                            @break
+                                                        @case(4)
+                                                            Error/s on request
+                                                            @break
+                                                        @case(5)
+                                                            Delayed issuance of request
+                                                            @break
+                                                        @case(6)
+                                                            Others (Specific issue)
+                                                            @break
+                                                    @endswitch
+                                                </p>
+
+                                                <small class="text-secondary" style="font-size: 12px;">
+                                                    <h6>
+                                                        <span class="badge text-bg-danger rounded-pill">Closed</span>
+                                                    </h6>
+                                                </small>
+                                            </a>
+                                        @endif
+                                    @endforeach
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -473,7 +607,7 @@
                     <div class="list-group" id="complaints-archive">
                         @php
                             $archivedComplaints = $complaints->filter(function($complaint) {
-                                return ($complaint->status == 2);
+                                return ($complaint->status == 'Non-Conforming');
                             });
                         @endphp
 
@@ -481,11 +615,11 @@
                             <p class="text-center text-secondary m-0">No non-conforming complaints!</p>
                         @else
                             @foreach ($complaints as $complaint)
-                                @if ($complaint->status === 2)
+                                @if ($complaint->status === 'Non-Conforming')
                                     <a href="complaint/{{ $complaint->id }}" class="list-group-item complaint-link" aria-current="true" data-id="{{ $complaint->id }}">
                                         <div class="d-flex w-100 justify-content-between">
                                             <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 70, $end = "...") }}</h5>
-                                            <small class="text-secondary">{{ $complaint->created_at->diffForHumans() }}</small>
+                                            <small class="text-secondary">{{ $complaint->updated_at->diffForHumans() }}</small>
                                         </div>
 
                                         <p class="mb-2">
@@ -522,9 +656,33 @@
                 </div>
                 
                 <div class="tab-pane flex-column" id="tab-management" role="tabpanel" aria-labelledby="btn-management" tabindex="0">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="text-secondary-emphasis m-0">Accounts</h5>
+                    <h5 class="text-secondary-emphasis m-0">My Account</h5>
+                    <hr class="border-2">
 
+                    <form class="d-flex flex-column gap-2 w-75 mb-5" method="post" action="{{ route('update-profile', ['id' => Auth::user()->id]) }}">
+                        @csrf
+
+                        <div class="input-group w-50">
+                            <span class="input-group-text w-25">Name</span>
+                            <input type="text" class="form-control" name="name" id="name" value="{{ Auth::user()->name }}">
+                        </div>
+
+                        <div class="input-group w-50">
+                            <span class="input-group-text w-25">Username</span>
+                            <input type="text" class="form-control" name="username" id="username" value="{{ Auth::user()->username }}">
+                        </div>
+                        
+
+                        <div class="input-group w-50">
+                            <span class="input-group-text w-25">Password</span>
+                            <input type="password" class="form-control" name="password" id="password" autocomplete="off">
+                        </div>
+
+                        <button class="btn btn-danger w-25" type="submit">Update</button>
+                    </form>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="text-secondary-emphasis m-0">Accounts Management</h5>
                         <div class="d-flex gap-2">
                             <button class="btn btn-danger" onclick="showOffice()">Create Office</button>
                             <button class="btn btn-danger" onclick="showAccount()">Create Account</button>
@@ -532,7 +690,6 @@
                     </div>
 
                     <hr class="border-2">
-
                     <div class="list-group mb-5">
                         <div class="accordion" id="office-list">
                             @foreach ($offices as $office)
@@ -550,7 +707,12 @@
                                                     <p class="mb-0 me-auto">{{ $user->name }}</p>
                                                     <div class="d-flex gap-2">
                                                         <button class="btn btn-primary view-user-btn" onclick="viewUser()" data-id="{{ $user->id }}">View</button>
-                                                        <button class="btn btn-danger">Delete</button>
+                                                        <form action="{{ route('user-delete', $user->id) }}" method="post" id="deleteUserForm">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            
+                                                            <button class="btn btn-danger" type="button" onclick="confirmDeleteUser()" data-id="{{ $user->id }}">Delete</button>
+                                                        </form>
                                                     </div>
                                                 </div>
 
@@ -564,13 +726,10 @@
                             @endforeach
                         </div>
                     </div>
-
-                    <h5 class="text-secondary-emphasis m-0 mt-6">Activity Log</h5>
-                    <hr class="border-2">
                 </div>
 
                 <div class="tab-pane flex-column" id="tab-complaint" role="tabpanel" aria-labelledby="btn-complaint" tabindex="0">
-                    <a href="">Back</a>
+                    <button class="btn btn-primary" id="btn-back">Back</button>
 
                     <hr class="border-2">
 
@@ -589,10 +748,15 @@
                                     @csrf
 
                                     <select class="form-select rounded-start" name="cstatus" id="cstatus">
-                                        <option value="default" selected disabled>Status</option>
-                                        <option value="1">Legitimate</option>
-                                        <option value="2">Non-conformity</option>
-                                        <option value="3">Inquiry</option>
+                                        <option value="default" selected disabled>-- Status --</option>
+                                        <option value="Processing">Legitimate</option>
+                                        <option value="Non-Conforming">Non-conformity</option>
+                                        <option value="Inquiry">Inquiry</option>
+                                    </select>
+
+                                    <select class="form-select rounded-start visually-hidden" name="cstatus" id="istatus">
+                                        <option value="Inquiry" selected>Open</option>
+                                        <option value="Closed">Closed</option>
                                     </select>
 
                                     <button class="btn btn-danger" type="submit">Update Status</button>
@@ -627,9 +791,9 @@
                             <div class="d-flex flex-column gap-2 mt-auto">
                                 <button class="btn btn-danger" onclick="showFiles()">View Attached Files</button>
 
-                                <div class="d-flex gap-2">
-                                    <button class="btn btn-danger flex-fill" id="btn-memo">Memo</button>
-                                    <button class="btn btn-danger flex-fill" id="btn-ccf">Customer Complaint Form</button>
+                                <div class="d-flex gap-2" id="complaintBtns">
+                                    <button class="btn btn-danger flex-fill" id="btn-memo">Create Memo</button>
+                                    <button class="btn btn-danger flex-fill" id="btn-ccf">Create Customer Complaint Form</button>
                                 </div>
                             </div>
                         </div>
@@ -794,7 +958,26 @@
             </div>
         </div>
 
-        <div class="modal fade" id="notifications" role="dialog" tabindex="-1" aria-labelledby="notifications" aria-hidden="true">
+        <div class="modal fade" id="confirmDeleteUser" role="dialog" tabindex="-1" aria-labelledby="confirmDeleteUser" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5">Confirm?</h1>
+                    </div>
+
+                    <div class="modal-body">
+                        Are you sure you want to delete this user?
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button class="btn btn-primary" onclick="deleteAccount()">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="modal fade" id="notifications" role="dialog" tabindex="-1" aria-labelledby="notifications" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -810,7 +993,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
@@ -831,6 +1014,12 @@
             </script>
         @endif
 
+        @if (session('complaint'))
+            <script>
+                document.getElementById('btn-complaint').click();
+            </script>
+        @endif
+        
         <script>
             const triggerTablist = document.querySelectorAll('#nav button');
 
@@ -842,6 +1031,26 @@
                     tabTrigger.show();
                 });
             });
+
+            function triggerTab(tab)
+            {
+                switch (tab) {
+                    case 'Pending':
+                        document.getElementById('btn-pending').click();
+                        break;
+                    case 'Processing':
+                        document.getElementById('btn-processing').click();
+                        break;
+                    case 'Non-Conforming':
+                        document.getElementById('btn-non').click();
+                        break;
+                    case 'Closed':
+                        document.getElementById('btn-archived').click();
+                        break;
+                    default:
+                        break;
+                }
+            }
 
             function showAccount()
             {
@@ -941,6 +1150,17 @@
                 modal.show();
             }
 
+            function confirmDeleteUser()
+            {
+                var modal = new bootstrap.Modal(document.getElementById('confirmDeleteUser'));
+                modal.show();
+            }
+
+            function deleteAccount()
+            {
+                document.getElementById('deleteUserForm').submit();
+            }
+
             $('.view-user-btn').on('click', function () {
                 var userId = $(this).data('id');
 
@@ -962,7 +1182,7 @@
                             day: 'numeric',
                         });
 
-                        $('#userModalName').text(data.user.username);
+                        $('#userModalName').text(data.user.name);
                         $('#userOfficeName').text(data.office.office_name);
                         $('#userCreatedOn').text(formattedCreatedDate);
                         $('#userLoggedOn').text(formattedLoggedDate);
@@ -990,6 +1210,8 @@
                                     day: 'numeric',
                                 });
 
+                                $('#btn-back').attr('onclick', `triggerTab('${data.status}')`);
+
                                 $('#complaint-form').attr('action', "{{ url('update-status'), '' }}/" + complaintId);
                                 $('#csub').text(formattedSpecificDate);
                                 $('#cago').html(`(${data.ago})`);
@@ -997,8 +1219,22 @@
 
                                 if (data.status) {
                                     $('#cstatus').val(data.status);
+
+                                    if (data.status == 'Inquiry') {
+                                        $('#istatus').removeClass('visually-hidden');
+                                        $('#cstatus').addClass('visually-hidden');
+                                    } else {
+                                        $('#istatus').addClass('visually-hidden');
+                                        $('#cstatus').removeClass('visually-hidden');
+                                    }
                                 } else {
                                     $('#cstatus').val('default');
+                                }
+
+                                if (data.status == 'Processing' || data.status == 'Closed') {
+                                    $('#complaint-form').addClass('visually-hidden');
+                                } else {
+                                    $('#complaint-form').removeClass('visually-hidden');
                                 }
 
                                 $('#coffice').val(data.office.office_name);
@@ -1009,11 +1245,12 @@
                                 $('#cevidence').attr('src', "{{ Storage::url('') }}" + data.evidence);
                                 
 
-                                if (data.status == 0) {
+                                if (data.status == 'Pending') {
                                     $('#btn-memo').prop('disabled', true);
                                     $('#btn-ccf').prop('disabled', true);
                                 } else {
                                     $('#btn-memo').prop('disabled', false);
+                                    $('#btn-memo').text('View Memo');
                                     if (data.has_memo) {
                                         $('#btn-ccf').prop('disabled', false);
                                     } else {
@@ -1021,9 +1258,21 @@
                                     }
                                 }
 
-                                $('#btn-memo').on('click', function () {
-                                    window.location.href = 'complaint/memo/' + complaintId;
-                                });
+                                if (data.status == 0 || data.status == 3) {
+                                    document.getElementById('complaintBtns').classList.add('visually-hidden');
+                                } else { 
+                                    document.getElementById('complaintBtns').classList.remove('visually-hidden');
+                                }
+
+                                if (data.status == 'Pending') {
+                                    $('#btn-memo').on('click', function () {
+                                        window.location.href = 'complaint/memo/' + complaintId;
+                                    });
+                                } else {
+                                    $('#btn-memo').on('click', function () {
+                                        window.location.href = 'complaint/memo/print/' + complaintId;
+                                    });
+                                }
 
                                 $('#btn-ccf').on('click', function () {
                                     window.location.href = 'complaint/form/' + complaintId;
@@ -1043,6 +1292,13 @@
             function showFiles() 
             {
                 $('#filesModal').modal('show');
+            }
+        
+            function printDashboard() {
+                const content = document.getElementById('table-dashboard').innerHTML;
+
+                document.body.innerHTML = content;
+                window.print();
             }
         </script>
     </body>

@@ -9,6 +9,7 @@ use App\Models\Memo;
 use App\Models\Office;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Models\Corrective;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -77,7 +78,7 @@ class ComplaintController extends Controller
         $complaint->status = $request->cstatus;
         $complaint->is_read = false;
 
-        if ($request->status == 0 and $complaint->ticket_id == null)
+        if ($request->status == 'Processing' and $complaint->ticket_id == null)
         {
             $ticket = new Ticket();
             $ticket->ticket_number = Ticket::count() + 1;
@@ -100,8 +101,9 @@ class ComplaintController extends Controller
         $users = User::where('office_id', Auth::user()->office_id)->get();
         $auth = Auth::user();
         $form = Form::where('complaint_id', $id)->first();
+        $corrective = Corrective::where('complaint_id', $id)->get();
 
-        return view('form')->with(['complaint' => $complaint, 'users' => $users, 'auth' => $auth, 'form' => $form]);        
+        return view('form')->with(['complaint' => $complaint, 'users' => $users, 'auth' => $auth, 'form' => $form, 'corrective' => $corrective]);        
     }
 
     public function submit_ccf(Request $request, $id)
@@ -119,11 +121,24 @@ class ComplaintController extends Controller
         $form->consequence = $request->consequence ?? $form->consequence;
         $form->root_cause = $request->root_cause ?? $form->root_cause;
         $form->nonconformity = $request->nonconformity ?? $form->nonconformity;
-        $form->corrective_action = $request->corrective_action ?? $form->corrective_action;
-        $form->implementation = $request->implementation ?? $form->implementation;
-        $form->measure = $request->effectiveness ?? $form->measure;
-        $form->period = $request->period ?? $form->period;
-        $form->responsible = $request->responsible ?? $form->responsible;
+
+        foreach ($request->input('corrective_action', []) as $index => $actionData) {
+            if (
+                isset($actionData['corrective_action'], $actionData['implementation'], $actionData['effectiveness'], 
+                      $actionData['period'], $actionData['responsible'])
+            ) {
+                Corrective::create([
+                    'corrective_action' => $actionData['corrective_action'],
+                    'implementation_date' => $actionData['implementation'],
+                    'effectiveness' => $actionData['effectiveness'],
+                    'monitoring_period' => $actionData['period'],
+                    'responsible' => $actionData['responsible'],
+                    'complaint_id' => $id,
+                ]);
+            }
+        }
+        
+
         $form->risk_opportunity = $request->risk_opportunity ?? $form->risk_opportunity;
         $form->changes = $request->changes ?? $form->changes;
         $form->prepared_by = $request->prepared_by ?? $form->prepared_by;
@@ -149,7 +164,7 @@ class ComplaintController extends Controller
 
         $complaint->save();
 
-        return redirect(Auth::user()->office_id == 1 ? '/qao' : '/office');
+        return redirect(Auth::user()->office_id == 1 ? '/qao' : '/office/' . Auth::user()->office_id);
     }
 
     public function submit_memo (Request $request, $id)
@@ -168,16 +183,17 @@ class ComplaintController extends Controller
         $complaint->save();
         $memo->save();
 
-        return redirect('/qao');
+        return redirect('/qao')->with('complaint', true);
     }
 
     public function print_ccf (Request $request, $id)
     {
         $complaint = Complaints::where('id', $id)->first();
+        $corrective = Corrective::where('complaint_id', $complaint->id)->get();
         $users = User::all();
         $form = Form::where('complaint_id', $complaint->id)->first();
 
-        return view('complaint_print')->with(['complaint' => $complaint, 'form' => $form, 'users' => $users]);
+        return view('complaint_print')->with(['complaint' => $complaint, 'form' => $form, 'users' => $users, 'corrective' => $corrective]);
     }
 
     public function print_memo (Request $request, $id)
@@ -192,9 +208,60 @@ class ComplaintController extends Controller
     {
         $complaint = Complaints::where('id', $id)->first();
 
-        $complaint->is_closed = $request->comp_status;
+        $complaint->is_closed = $request->cstatus;
+        $complaint->verified_at = Carbon::now();
         $complaint->save();
 
         return back();
+    }
+
+    public function form_view ($id)
+    {
+        $complaint = Complaints::where('id', $id)->first();
+        $corrective = Corrective::where('complaint_id', $id)->get();
+
+        return view('correctives')->with(['corrective' => $corrective, 'complaint' => $complaint]);
+    }
+
+    public function monitor ($id)
+    {
+        $complaint = Complaints::where('id', $id)->first();
+        $complaint->is_monitored = true;
+        $complaint->save();
+
+        return back();
+    }
+
+    public function accept (Request $request, $id) 
+    {
+        $corrective = Corrective::where('id', $id)->first();
+        $corrective->comment = $request->feedback;
+        $corrective->is_approved = $request->accepted;
+
+        $corrective->save();
+
+        return back();
+    }
+
+    public function upload (Request $request, $id)
+    {
+        $corrective = Corrective::where('id', $id)->first();
+        $file = $request->file('ufile')->store('evidence', 'public');
+        $corrective->document = $file;
+        $corrective->save();
+
+        return back();
+    }
+
+    public function download (Request $request, $id)
+    {
+        $corrective = Corrective::find($id);
+        $path = $corrective->document;
+
+        if (Storage::disk('public')->exists($path)) {
+            return Storage::download('public/' . $path);
+        } else {
+            return redirect()->back();
+        }
     }
 }

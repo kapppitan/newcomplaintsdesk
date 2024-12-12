@@ -135,7 +135,7 @@
                     <div class="list-group" id="complaints-inbox">
                         @php
                             $inboxComplaints = $complaints->filter(function($complaint) {
-                                return $complaint->phase == 2;
+                                return $complaint->phase == 1;
                             });
                         @endphp
 
@@ -143,7 +143,7 @@
                             <p class="text-center text-secondary m-0">Inbox is empty.</p>
                         @else
                             @foreach ($complaints as $complaint)
-                                @if ($complaint->phase == 2)
+                                @if ($complaint->phase == 1)
                                     <a href="/complaint/form/{{ $complaint->id }}" class="list-group-item" aria-current="true">
                                         <div class="d-flex w-100 justify-content-between">
                                             <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 70, $end = "...") }}</h5>
@@ -200,7 +200,7 @@
                     <div class="list-group" id="complaints-outbox">
                         @php
                             $outboxComplaints = $complaints->filter(function($complaint) {
-                                return $complaint->phase == 3;
+                                return $complaint->is_monitored;
                             });
                         @endphp
 
@@ -208,8 +208,8 @@
                             <p class="text-center text-secondary m-0">There are no monitored cases at the moment.</p>
                         @else
                             @foreach ($complaints as $complaint)
-                                @if ($complaint->phase == 3)
-                                    <a href="/complaint/form/{{ $complaint->id }}" class="list-group-item" aria-current="true">
+                                @if ($complaint->is_monitored)
+                                    <a href="/corrective/{{ $complaint->id }}" class="list-group-item" aria-current="true">
                                         <div class="d-flex w-100 justify-content-between">
                                             <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 70, $end = "...") }}</h5>
                                             <small class="text-secondary">{{ $complaint->updated_at->diffForHumans() }}</small>
@@ -240,7 +240,7 @@
 
                                         <small class="text-secondary" style="font-size: 12px;">
                                             <h6>
-                                                <span class="badge text-bg-info text-light rounded-pill">Sent</span>
+                                                <span class="badge text-bg-danger text-light rounded-pill">Monitored</span>
                                             </h6>
                                         </small>
                                     </a>
@@ -279,7 +279,7 @@
             </div>
         </div>
 
-        <div class="modal fade" id="notifications" role="dialog" tabindex="-1" aria-labelledby="notifications" aria-hidden="true">
+        <!-- <div class="modal fade" id="notifications" role="dialog" tabindex="-1" aria-labelledby="notifications" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -295,7 +295,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> -->
 
         <script src="{{ asset('js/jquery-3.7.1.min.js') }}"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>

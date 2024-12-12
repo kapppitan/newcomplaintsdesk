@@ -18,7 +18,7 @@
             @elseif(Auth::user()->office_id == 2)
                 <a href="/qmso">Back</a>
             @else
-                <a href="/office">Back</a>
+                <a href="/office/{{ Auth::user()->office_id }}">Back</a>
             @endif
 
             <h4 class="text-danger position-absolute start-50 translate-middle-x" style="top: 15px;">Customer Complaint Form</h4>
@@ -98,7 +98,7 @@
                                 <select class="form-select w-25" name="validated_by" {{ ($auth->office_id != 1 || $complaint->phase > 0) ? 'disabled' : '' }}>
                                     @foreach ($users as $user)
                                         <option value="{{ $user->id }}" {{ $user->id == $complaint->validated_by ? 'selected' : '' }}>
-                                            {{ $user->username }}
+                                            {{ $user->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -113,7 +113,7 @@
                                 <select class="form-select w-25" name="acknowledgedqao_by" {{ ($auth->office_id != 1 || $complaint->phase > 0) ? 'disabled' : '' }}>
                                     @foreach ($users as $user)
                                         <option value="{{ $user->id }}" {{ $user->id == $complaint->validated_by ? 'selected' : '' }}>
-                                            {{ $user->username }}
+                                            {{ $user->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -157,41 +157,135 @@
 
                     <div class="mt-3 w-75">
                         <div class="d-flex flex-column gap-3">
-                            <div class="row d-flex" id="corrective_action_1">
-                                <div class="col-md-7 form-group">
-                                    <label class="form-label" for="actions">Corrective Actions</label>
-                                    <textarea class="form-control" style="resize: none;" rows="13" id="actions" {{ $auth->office_id == 1 ? 'disabled' : '' }} name="corrective_action">{{ $form->corrective_action ?? '' }}</textarea>
-                                </div>
-
-                                <div class="col-md-5 d-flex gap-2 flex-column">
-                                    <div class="d-flex flex-column form-group">
-                                        <label class="form-label" for="implementation">Implementation Date</label>
-                                        <input 
+                            @forelse ($corrective as $corr)
+                                <div class="row d-flex" id="corrective_action_1">
+                                    <div class="col-md-7 form-group">
+                                        <label class="form-label" for="corrective_action_1_actions">Corrective Actions</label>
+                                        <textarea 
                                             class="form-control" 
-                                            type="date" 
-                                            id="implementation" 
+                                            style="resize: none;" 
+                                            rows="13" 
+                                            id="corrective_action_1_actions" 
                                             {{ $auth->office_id == 1 ? 'disabled' : '' }} 
-                                            value="{{ optional($form)->implementation ? \Carbon\Carbon::parse($form->implementation)->format('Y-m-d') : '' }}" 
-                                            name="implementation"
-                                        >
+                                            name="corrective_action[1][corrective_action]"
+                                        >{{ $corr->corrective_action ?? '' }}</textarea>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label class="form-label" for="effectiveness">Measure of Effectiveness</label>
-                                        <textarea class="form-control" style="resize: none;" rows="3" name="effectiveness" id="effectiveness" {{ $auth->office_id == 1 ? 'disabled' : '' }} name="measure">{{ $form->measure ?? '' }}</textarea>
-                                    </div>
+                                    <div class="col-md-5 d-flex gap-2 flex-column">
+                                        <div class="d-flex flex-column form-group">
+                                            <label class="form-label" for="corrective_action_1_implementation">Implementation Date</label>
+                                            <input 
+                                                class="form-control" 
+                                                type="date" 
+                                                id="corrective_action_1_implementation" 
+                                                {{ $auth->office_id == 1 ? 'disabled' : '' }} 
+                                                value="{{ optional($corr)->implementation_date ? \Carbon\Carbon::parse($corr->implementation_date)->format('Y-m-d') : '' }}" 
+                                                name="corrective_action[1][implementation]"
+                                            >
+                                        </div>
 
-                                    <div class="form-group">
-                                        <label class="form-label" for="period">Monitoring Period for CA</label>
-                                        <input class="form-control" type="text" id="period" {{ $auth->office_id == 1 ? 'disabled' : '' }} value="{{ $form->period ?? '' }}" name="period">
-                                    </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="corrective_action_1_effectiveness">Measure of Effectiveness</label>
+                                            <textarea 
+                                                class="form-control" 
+                                                style="resize: none;" 
+                                                rows="3" 
+                                                name="corrective_action[1][effectiveness]" 
+                                                id="corrective_action_1_effectiveness" 
+                                                {{ $auth->office_id == 1 ? 'disabled' : '' }}
+                                            >{{ $corr->effectiveness ?? '' }}</textarea>
+                                        </div>
 
-                                    <div class="form-group">
-                                        <label class="form-label" for="responsible">Responsible</label>
-                                        <input class="form-control" type="text" id="responsible" {{ $auth->office_id == 1 ? 'disabled' : '' }} value="{{ $form->responsible ?? '' }}" name="responsible">
+                                        <div class="form-group">
+                                            <label class="form-label" for="corrective_action_1_period">Monitoring Period for CA</label>
+                                            <input 
+                                                class="form-control" 
+                                                type="text" 
+                                                id="corrective_action_1_period" 
+                                                {{ $auth->office_id == 1 ? 'disabled' : '' }} 
+                                                value="{{ $corr->monitoring_period ?? '' }}" 
+                                                name="corrective_action[1][period]"
+                                            >
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="corrective_action_1_responsible">Responsible</label>
+                                            <input 
+                                                class="form-control" 
+                                                type="text" 
+                                                id="corrective_action_1_responsible" 
+                                                {{ $auth->office_id == 1 ? 'disabled' : '' }} 
+                                                value="{{ $corr->responsible ?? '' }}" 
+                                                name="corrective_action[1][responsible]"
+                                            >
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            @empty
+                                <div class="row d-flex" id="corrective_action_1">
+                                    <div class="col-md-7 form-group">
+                                        <label class="form-label" for="corrective_action_1_actions">Corrective Actions</label>
+                                        <textarea 
+                                            class="form-control" 
+                                            style="resize: none;" 
+                                            rows="13" 
+                                            id="corrective_action_1_actions" 
+                                            {{ $auth->office_id == 1 ? 'disabled' : '' }} 
+                                            name="corrective_action[1][corrective_action]"
+                                        ></textarea>
+                                    </div>
+
+                                    <div class="col-md-5 d-flex gap-2 flex-column">
+                                        <div class="d-flex flex-column form-group">
+                                            <label class="form-label" for="corrective_action_1_implementation">Implementation Date</label>
+                                            <input 
+                                                class="form-control" 
+                                                type="date" 
+                                                id="corrective_action_1_implementation" 
+                                                {{ $auth->office_id == 1 ? 'disabled' : '' }} 
+                                                value="" 
+                                                name="corrective_action[1][implementation]"
+                                            >
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="corrective_action_1_effectiveness">Measure of Effectiveness</label>
+                                            <textarea 
+                                                class="form-control" 
+                                                style="resize: none;" 
+                                                rows="3" 
+                                                name="corrective_action[1][effectiveness]" 
+                                                id="corrective_action_1_effectiveness" 
+                                                {{ $auth->office_id == 1 ? 'disabled' : '' }}
+                                            ></textarea>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="corrective_action_1_period">Monitoring Period for CA</label>
+                                            <input 
+                                                class="form-control" 
+                                                type="text" 
+                                                id="corrective_action_1_period" 
+                                                {{ $auth->office_id == 1 ? 'disabled' : '' }} 
+                                                value="" 
+                                                name="corrective_action[1][period]"
+                                            >
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label" for="corrective_action_1_responsible">Responsible</label>
+                                            <input 
+                                                class="form-control" 
+                                                type="text" 
+                                                id="corrective_action_1_responsible" 
+                                                {{ $auth->office_id == 1 ? 'disabled' : '' }} 
+                                                value="{{ $corr->responsible ?? '' }}" 
+                                                name="corrective_action[1][responsible]"
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforelse
 
                             @if ($auth->office_id != 1 && $auth->office_id != 2)
                                 <button class="btn btn-primary w-100" type="button" onclick="add_corrective_action()" id="corrective_btn">
@@ -219,7 +313,7 @@
                                 <select class="form-select w-25" name="prepared_by" id="prepared_by" {{ $auth->office_id == 1 ? 'disabled' : '' }}>
                                     @foreach ($users as $user)
                                         <option value="{{ $user->id }}" {{ $user->id == $complaint->validated_by ? 'selected' : '' }}>
-                                            {{ $user->username }}
+                                            {{ $user->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -240,7 +334,7 @@
                                 <select class="form-select w-25" name="approved_by" id="approved_by" {{ $auth->office_id == 1 ? 'disabled' : '' }}>
                                     @foreach ($users as $user)
                                         <option value="{{ $user->id }}" {{ $user->id == $complaint->validated_by ? 'selected' : '' }}>
-                                            {{ $user->username }}
+                                            {{ $user->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -261,7 +355,7 @@
                                 <select class="form-select w-25" name="acknowledged_by" id="acknowledged_by" {{ $auth->office_id == 1 ? 'disabled' : '' }}>
                                     @foreach ($users as $user)
                                         <option value="{{ $user->id }}" {{ $user->id == $complaint->validated_by ? 'selected' : '' }}>
-                                            {{ $user->username }}
+                                            {{ $user->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -295,7 +389,7 @@
                                     @foreach ($users as $user)
                                         <option value="{{ $user->id }}" 
                                             {{ optional($form)->reported_by == $user->id ? 'selected' : '' }}>
-                                            {{ $user->username }}
+                                            {{ $user->name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -356,14 +450,12 @@
             document.addEventListener('DOMContentLoaded', (event) => {
                 const reasonsTextarea = document.getElementById('reasons');
 
-                // Show textarea when "Not Accepted" is clicked
                 document.getElementById('not-accepted').addEventListener('click', function () {
                     if (reasonsTextarea.classList.contains('d-none')) {
                         reasonsTextarea.classList.remove('d-none');
                     }
                 });
 
-                // Hide textarea when "Accepted" is clicked
                 document.getElementById('accepted').addEventListener('click', function () {
                     if (!reasonsTextarea.classList.contains('d-none')) {
                         reasonsTextarea.classList.add('d-none');
@@ -371,21 +463,30 @@
                 });
             });
 
+            let correctiveActionCount = 1;
+            function add_corrective_action() {
+                correctiveActionCount++;
+                const originalAction = document.getElementById("corrective_action_1");
+                const newAction = originalAction.cloneNode(true);
+
+                newAction.id = `corrective_action_${correctiveActionCount}`;
+                newAction.querySelectorAll('input, textarea').forEach((input) => {
+                    const baseName = input.getAttribute("name").replace(/\[\d*\]/, '');
+                    const fieldName = baseName.split('[').pop().replace(']', '');
+                    input.id = `corrective_action_${correctiveActionCount}_${fieldName}`;
+                    input.setAttribute("name", `corrective_action[${correctiveActionCount}][${fieldName}]`);
+                    input.value = '';
+                });
+
+                document.getElementById("corrective_btn").before(newAction);
+            }
+
             function confirm_form() {
                 $('#confirmModal').modal('show');
             }
 
             function submit_form() {
                 document.getElementById('formContent').submit();
-            }
-
-            function add_corrective_action() {
-                var corrective = document.getElementById('corrective_action_1');
-                var btn = document.getElementById('corrective_btn');
-
-                let new_corrective = corrective.cloneNode(true);
-
-                btn.before(new_corrective);
             }
         </script>
     </body>

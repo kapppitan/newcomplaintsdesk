@@ -16,7 +16,7 @@
         <h3 class="text-light m-0 d-flex">WMSU Complaints Desk</h3>
     </nav>
 
-    <form class="p-3 d-flex row gap-2 justify-content-center m-0" method="post" action="{{ route('complain') }}" enctype="multipart/form-data">
+    <form class="p-3 d-flex row gap-2 justify-content-center m-0" method="post" action="{{ route('complain') }}" enctype="multipart/form-data" id="complaintform">
         @csrf
         <div class="p-0 d-flex gap-2 flex-column col-md-8">
             <div class="form-group">
@@ -33,7 +33,7 @@
 
             <div class="form-group">
                 <label class="form-label m-0" for="description">Complaint Details</label>
-                <textarea class="form-control border-danger border-2" rows="15" name="details" required></textarea>
+                <textarea class="form-control border-danger border-2" rows="20" style="resize: none;" name="details" required></textarea>
             </div>
         </div>
 
@@ -84,7 +84,7 @@
                 <input class="form-control border-danger border-2" name="file" type="file" required>
             </div>
 
-            <input class="btn btn-danger w-100 mt-auto" type="submit" value="Submit Complaint">
+            <button class="btn btn-danger w-100 mt-auto" type="button" data-bs-toggle="modal" data-bs-target="#confirmComplaint">Submit Complaint</button>
         </div>
     </form>
 
@@ -101,6 +101,25 @@
 
                 <div class="modal-footer">
                     <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="confirmComplaint" role="dialog" tabindex="-1" aria-labelledby="confirmComplaint" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">Confirm?</h1>
+                </div>
+
+                <div class="modal-body">
+                    Do you want to submit this complaint?
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button class="btn btn-primary" onclick="document.getElementById('complaintform').submit()">Confirm</button>
                 </div>
             </div>
         </div>
