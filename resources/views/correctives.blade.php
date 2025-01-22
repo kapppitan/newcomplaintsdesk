@@ -11,19 +11,19 @@
         <title>Customer Complaint Form</title>
     </head>
 
-    <body class="bg-light p-4 overflow-x-hidden">
+    <body class="bg-light p-4 overflow-y-hidden">
         <div class="d-flex justify-content-between">
-            <a href="">Back</a>
+            <a href="/office/{{ Auth::user()->office_id }}">Back</a>
             <a href="/complaint/form/print/{{ $complaint->id }}" class="btn btn-secondary">Print</a>
         </div>
 
         <hr class="border-2">
 
         <div class="row h-100">
-            <div class="col-sm-8 d-flex flex-column gap-2">
+            <div class="col-sm-8 d-flex flex-column gap-2 overflow-y-scroll" style="height: 650px;">
                 @foreach ($corrective as $corr)
                     <div class="container-fluid d-flex flex-column gap-2 bg-white p-2 rounded-1" id="corrective_action">
-                        <label class="form-label" for="details">Corrective Action</label>
+                        <label class="form-label" for="details">Corrective Action #{{ $loop->iteration }}</label>
                         
                         <div class="row">
                             <div class="col">
@@ -63,7 +63,11 @@
                                         <button class="btn btn-danger">Submit</button>
                                     </form>
                                 @else
-                                    <a class="btn btn-danger" href="/download/{{ $corr->id }}">View Evidence</a>
+                                    @if ($corr->document)
+                                        <a class="btn btn-danger" href="/download/{{ $corr->id }}">View Evidence</a>
+                                    @else
+                                        <button class="btn btn-danger" disabled>View Evidence</button>
+                                    @endif
                                 @endif
                             </div>
                         </div>
@@ -76,12 +80,12 @@
 
                             <div class="container-fluid d-flex gap-5">
                                 <div class="form-group">
-                                    <input type="radio" name="accepted" id="accept" value="1" required {{ Auth::user()->office_id == 1 || Auth::user()->office_id == 2 ? '' : 'disabled  ' }} {{ $corr->is_approved ? 'checked' : '' }}>
+                                    <input type="radio" name="accepted" id="accept" value="1" required {{ Auth::user()->office_id == 1 || Auth::user()->office_id == 2 ? '' : 'disabled  ' }} {{ $corr->is_approved ? 'checked' : '' && $corr->is_approved != null }}>
                                     <label for="accept">Accepted</label>
                                 </div>
 
                                 <div class="form-group">
-                                    <input type="radio" name="accepted" id="notaccept" value="0" required {{ Auth::user()->office_id == 1 || Auth::user()->office_id == 2 ? '' : 'disabled  ' }} {{ $corr->is_approved ? '' : 'checked' }}>
+                                    <input type="radio" name="accepted" id="notaccept" value="0" required {{ Auth::user()->office_id == 1 || Auth::user()->office_id == 2 ? '' : 'disabled  ' }} {{ $corr->is_approved ? '' : 'checked' && $corr->is_approved != null }}>
                                     <label for="accept">Not Accepted</label>
                                 </div>
 
@@ -95,30 +99,110 @@
             </div>
 
             <div class="col-sm-4 d-flex flex-column gap-3">
-                <form class="input-group" method="post" action="{{ route('open-close', ['id' => $complaint->id]) }}" id="status">
-                    @csrf
+                @if (Auth::user()->office_id == 2)
+                    <form class="input-group" method="post" action="{{ route('open-close', ['id' => $complaint->id]) }}" id="status">
+                        @csrf
 
-                    <select class="form-select" name="cstatus" id="cstatus">
-                        <option value="0" {{ $complaint->is_closed ? '' : 'selected' }}>Open</option>
-                        <option value="1" {{ $complaint->is_closed ? 'selected' : '' }}>Closed</option>
-                    </select>
+                        <select class="form-select" name="cstatus" id="cstatus" {{ $complaint->is_monitored ? '' : 'disabled' }}>
+                            <option value="0" {{ $complaint->is_closed ? '' : 'selected' }}>Open</option>
+                            <option value="1" {{ $complaint->is_closed ? 'selected' : '' }}>Closed</option>
+                        </select>
 
-                    <button class="btn btn-danger">Update Status</button>
-                </form>
+                        <button class="btn btn-danger" {{ $complaint->is_monitored ? '' : 'disabled' }}>Update Status</button>
+                    </form>
+                @endif
 
-                <form class="d-flex flex-column gap-2" method="post" action="{{ route('monitor', ['id' => $complaint->id]) }}" id="monitor">
-                    @csrf
+                <a class="btn btn-danger" href="/complaint/form/print/{{ $complaint->id }}" id="view-complaint-form">View Complaint Form</a>
 
-                    <a class="btn btn-danger flex-fill" href="/complaint/form/print/{{ $complaint->id }}" id="view-complaint-form">View Complaint Form</a>
-                    <button class="btn btn-danger flex-fill">Monitor Complaint</button>
-                </form>
+                @if (Auth::user()->office_id == 2)
+                    <form class="d-flex flex-column gap-2" method="post" action="{{ route('monitor', ['id' => $complaint->id]) }}" id="monitor">
+                        @csrf
+
+                        <button class="btn btn-danger flex-fill" type="button" data-bs-toggle="modal" data-bs-target="#confirmMonitor" {{ $complaint->is_monitored ? 'disabled' : '' }}>Monitor Complaint</button>
+                    </form>
+                @endif
             </div>
         </div>
 
+        <div class="modal fade" id="monitorModal" role="dialog" tabindex="-1" aria-labelledby="monitorModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="userModalName">Success!</h1>
+                    </div>
 
+                    <div class="modal-body">
+                        This complaint is now monitored.
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="confirmMonitor" role="dialog" tabindex="-1" aria-labelledby="confirmMonitor" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="userModalName">Confirmation</h1>
+                    </div>
+
+                    <div class="modal-body">
+                        Mark this complaint as monitored?
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-primary" onclick="document.getElementById('monitor').submit()">Confirm</button>
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="closedModal" role="dialog" tabindex="-1" aria-labelledby="closedModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="userModalName">Complaint Closed</h1>
+                    </div>
+
+                    <div class="modal-body">
+                        Complaint is now closed.
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <script src="{{ asset('js/jquery-3.7.1.min.js') }}"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>   
+    
+        @if (session('monitored'))
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    var modal = new bootstrap.Modal(document.getElementById("monitorModal"), {});
+                    document.onreadystatechange = function () {
+                        modal.show();
+                    };
+                });
+            </script>
+        @endif
+
+        @if (session('closed'))
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    var modal = new bootstrap.Modal(document.getElementById("closedModal"), {});
+                    document.onreadystatechange = function () {
+                        modal.show();
+                    };
+                });
+            </script>
+        @endif
     </body>
 </html>

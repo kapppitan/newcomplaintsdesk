@@ -96,11 +96,15 @@
                             <span>Validated By</span>
                             <div class="input-group">
                                 <select class="form-select w-25" name="validated_by" {{ ($auth->office_id != 1 || $complaint->phase > 0) ? 'disabled' : '' }}>
-                                    @foreach ($users as $user)
-                                        <option value="{{ $user->id }}" {{ $user->id == $complaint->validated_by ? 'selected' : '' }}>
-                                            {{ $user->name }}
-                                        </option>
-                                    @endforeach
+                                    @if (optional($form)->validated_by == null)
+                                        @foreach ($users as $user)
+                                            <option value="{{ $user->id }}" {{ $user->id == ($form->validated_by ?? '') ? 'selected' : '' }}>
+                                                {{ $user->name }}
+                                            </option>
+                                        @endforeach
+                                    @else
+                                        <option selected>{{ App\Models\User::find($form->validated_by)->name }}</option>
+                                    @endif
                                 </select>
 
                                 <input class="form-control" type="date" aria-label="validated-date" name="validated_on" value="{{ $complaint->date_verified->format('Y-m-d') }}" {{ ($auth->office_id != 1 || $complaint->phase > 0) ? 'disabled' : '' }}>
@@ -111,19 +115,23 @@
                             <span>Acknowledged By</span>
                             <div class="input-group">
                                 <select class="form-select w-25" name="acknowledgedqao_by" {{ ($auth->office_id != 1 || $complaint->phase > 0) ? 'disabled' : '' }}>
-                                    @foreach ($users as $user)
-                                        <option value="{{ $user->id }}" {{ $user->id == $complaint->validated_by ? 'selected' : '' }}>
-                                            {{ $user->name }}
-                                        </option>
-                                    @endforeach
+                                    @if (optional($form)->acknowledged_by == null)
+                                        @foreach ($users as $user)
+                                            <option value="{{ $user->id }}" {{ $user->id == ($form->acknowledgedqao_by ?? '') ? 'selected' : '' }}>
+                                                {{ $user->name }}
+                                            </option>
+                                        @endforeach
+                                    @else
+                                        <option selected>{{ App\Models\User::find($form->acknowledgedqao_by)->name }}</option>
+                                    @endif
                                 </select>
                                  
                                 <input 
                                     class="form-control" 
                                     type="date" 
                                     aria-label="acknowledge-date" 
-                                    name="acknowledged_on" 
-                                    value="{{ optional($form)->acknowledged_on ? \Carbon\Carbon::parse($form->acknowledged_on)->format('Y-m-d') : '' }}" 
+                                    name="acknowledgedqao_on" 
+                                    value="{{ optional($form)->acknowledgedqao_on ? \Carbon\Carbon::parse($form->acknowledgedqao_on)->format('Y-m-d') : '' }}" 
                                     {{ ($auth->office_id != 1 || $complaint->phase > 0) ? 'disabled' : '' }}
                                 >
                             </div>
@@ -311,11 +319,15 @@
                                 <span class="input-group-text w-25">Prepared By</span>
 
                                 <select class="form-select w-25" name="prepared_by" id="prepared_by" {{ $auth->office_id == 1 ? 'disabled' : '' }}>
-                                    @foreach ($users as $user)
-                                        <option value="{{ $user->id }}" {{ $user->id == $complaint->validated_by ? 'selected' : '' }}>
-                                            {{ $user->name }}
-                                        </option>
-                                    @endforeach
+                                    @if (optional($form)->prepared_by == null)
+                                        @foreach ($users as $user)
+                                            <option value="{{ $user->id }}">
+                                                {{ $user->name }}
+                                            </option>
+                                        @endforeach
+                                    @else
+                                        <option value="">{{ App\Models\User::find($form->prepared_by)->name }}</option>
+                                    @endif
                                 </select>
 
                                 <input 
@@ -332,11 +344,15 @@
                                 <span class="input-group-text w-25">Approved By</span>
                                 
                                 <select class="form-select w-25" name="approved_by" id="approved_by" {{ $auth->office_id == 1 ? 'disabled' : '' }}>
-                                    @foreach ($users as $user)
-                                        <option value="{{ $user->id }}" {{ $user->id == $complaint->validated_by ? 'selected' : '' }}>
-                                            {{ $user->name }}
-                                        </option>
-                                    @endforeach
+                                    @if (optional($form)->approved_by == null)
+                                        @foreach ($users as $user)
+                                            <option value="{{ $user->id }}">
+                                                {{ $user->name }}
+                                            </option>
+                                        @endforeach
+                                    @else
+                                        <option value="">{{ App\Models\User::find($form->approved_by)->name }}</option>
+                                    @endif
                                 </select>
 
                                 <input 
@@ -353,11 +369,15 @@
                                 <span class="input-group-text w-25">Acknowledged By</span>
                                 
                                 <select class="form-select w-25" name="acknowledged_by" id="acknowledged_by" {{ $auth->office_id == 1 ? 'disabled' : '' }}>
-                                    @foreach ($users as $user)
-                                        <option value="{{ $user->id }}" {{ $user->id == $complaint->validated_by ? 'selected' : '' }}>
-                                            {{ $user->name }}
-                                        </option>
-                                    @endforeach
+                                    @if (optional($form)->acknowledged_by == null)
+                                        @foreach ($users as $user)
+                                            <option value="{{ $user->id }}">
+                                                {{ $user->name }}
+                                            </option>
+                                        @endforeach
+                                    @else
+                                        <option value="">{{ App\Models\User::find($form->acknowledged_by)->name }}</option>
+                                    @endif
                                 </select>
 
                                 <input 

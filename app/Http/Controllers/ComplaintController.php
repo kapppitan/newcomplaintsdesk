@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Form;
+use App\Models\Notifications;
 use Illuminate\Http\Request;
 use App\Models\Complaints;
 use App\Models\Memo;
@@ -13,7 +14,6 @@ use App\Models\Corrective;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-
 class ComplaintController extends Controller
 {
     public function index (Request $request)
@@ -37,6 +37,7 @@ class ComplaintController extends Controller
         $complaint->details = $request->input('details');
         $complaint->email = $request->input('email');
         $complaint->phone = $request->input('phone');
+        $complaint->status = 'Pending';
 
         $file = $request->file('file')->store('evidence', 'public');
         $complaint->image_path = $file;
@@ -45,7 +46,7 @@ class ComplaintController extends Controller
 
         $complaint->save();
         
-        return redirect('/')->with('success', true);
+        return redirect('/')->with(['success' => true]);
     }
 
     public function view ($id)
@@ -78,7 +79,7 @@ class ComplaintController extends Controller
         $complaint->status = $request->cstatus;
         $complaint->is_read = false;
 
-        if ($request->status == 'Processing' and $complaint->ticket_id == null)
+        if ($request->cstatus == 'Processing' and $complaint->ticket_id == null)
         {
             $ticket = new Ticket();
             $ticket->ticket_number = Ticket::count() + 1;
@@ -98,12 +99,13 @@ class ComplaintController extends Controller
     public function form_index (Request $request, $id)
     {
         $complaint = Complaints::where('id', $id)->first();
+        $offices = User::all();
         $users = User::where('office_id', Auth::user()->office_id)->get();
         $auth = Auth::user();
         $form = Form::where('complaint_id', $id)->first();
         $corrective = Corrective::where('complaint_id', $id)->get();
 
-        return view('form')->with(['complaint' => $complaint, 'users' => $users, 'auth' => $auth, 'form' => $form, 'corrective' => $corrective]);        
+        return view('form')->with(['complaint' => $complaint, 'users' => $users, 'auth' => $auth, 'form' => $form, 'corrective' => $corrective, 'offices' => $offices]);        
     }
 
     public function submit_ccf(Request $request, $id)
@@ -141,15 +143,21 @@ class ComplaintController extends Controller
 
         $form->risk_opportunity = $request->risk_opportunity ?? $form->risk_opportunity;
         $form->changes = $request->changes ?? $form->changes;
+
         $form->prepared_by = $request->prepared_by ?? $form->prepared_by;
         $form->prepared_on = $request->prepared_on ?? $form->prepared_on;
         $form->approved_by = $request->approved_by ?? $form->approved_by;
         $form->approved_on = $request->approved_on ?? $form->approved_on;
         $form->acknowledged_by = $request->acknowledged_by ?? $form->acknowledged_by;
         $form->acknowledged_on = $request->acknowledged_on ?? $form->acknowledged_on;
+
         $form->feedback = $request->feedback ?? $form->feedback;
+
         $form->reported_by = $request->reported_by ?? $form->reported_by;
-        $form->date_reported = $request->date_reported;
+        if ($request->reported_by != null) {
+            $form->date_reported = Carbon::now();
+        }
+        
         $form->is_approved = (int) $request->input('accept');
         $form->further_action = $request->reasons ?? $form->further_action;
 
@@ -209,10 +217,11 @@ class ComplaintController extends Controller
         $complaint = Complaints::where('id', $id)->first();
 
         $complaint->is_closed = $request->cstatus;
+        $complaint->status = 'Closed';
         $complaint->verified_at = Carbon::now();
         $complaint->save();
 
-        return back();
+        return redirect('/corrective/' . $id)->with('closed', true);
     }
 
     public function form_view ($id)
@@ -229,7 +238,7 @@ class ComplaintController extends Controller
         $complaint->is_monitored = true;
         $complaint->save();
 
-        return back();
+        return redirect('/corrective/' . $id)->with('monitored', True);
     }
 
     public function accept (Request $request, $id) 

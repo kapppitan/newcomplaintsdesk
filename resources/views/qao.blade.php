@@ -254,12 +254,14 @@
 
                         <tbody>
                             @foreach ($offices as $office)
-                                <tr>
-                                    <td class="w-50">{{ $office->office_name }}</td>
-                                    <td class="text-center">{{ App\Models\Complaints::where('office_id', $office->id)->where('status', '!=', 'Closed')->count() }}</td>
-                                    <td class="text-center">{{ App\Models\Complaints::where('office_id', $office->id)->where('status', 'Closed')->count() }}</td>
-                                    <td class="text-center">{{ App\Models\Complaints::where('office_id', $office->id)->count() }}</td>
-                                </tr>
+                                @if ($office->id != 1 && $office->id != 2)
+                                    <tr>
+                                        <td class="w-50">{{ $office->office_name }}</td>
+                                        <td class="text-center">{{ App\Models\Complaints::where('office_id', $office->id)->where('status', '!=', 'Closed')->count() }}</td>
+                                        <td class="text-center">{{ App\Models\Complaints::where('office_id', $office->id)->where('status', 'Closed')->count() }}</td>
+                                        <td class="text-center">{{ App\Models\Complaints::where('office_id', $office->id)->count() }}</td>
+                                    </tr>
+                                @endif
                             @endforeach
                         </tbody>
                     </table>
@@ -329,12 +331,12 @@
                 <div class="tab-pane flex-column" id="tab-inquiry" role="tabpanel" aria-labelledby="btn-inquiry" tabindex="0">
                     <div class="d-flex align-items-center">
                         <h5 class="text-secondary-emphasis m-0">Inquiries</h5>
-                        <input class="form-control w-25 ms-auto" type="search" name="search" placeholder="Search..." onkeyup="search_complaint(1)" id="search-inquiry">
+                        <input class="form-control w-25 ms-auto" type="search" name="search" placeholder="Search..." onkeyup="search_complaint(5)" id="search-inquiry">
                     </div>
                     
                     <hr class="border-2">
 
-                    <div class="list-group" id="complaints-pending">
+                    <div class="list-group" id="complaints-inquiry">
                         @php
                             $pendingComplaints = $complaints->filter(function($complaint) {
                                 return $complaint->status == 'Inquiry';
@@ -458,7 +460,7 @@
                                                         <span class="badge text-bg-danger rounded-pill">Returned</span>
                                                         @break
                                                     @case(3)
-                                                        <span class="badge text-bg-info text-white rounded-pill">Submitted</span>
+                                                        <span class="badge text-bg-info text-white rounded-pill">Submitted to QMSO</span>
                                                         @break
                                                 @endswitch
                                             </h6>
@@ -540,7 +542,7 @@
                             </div>
                         </div>
 
-                        <div class="tab-pane flex-column p-4" id="disregard-tab-pane" aria-labelledby="disregard-tab" tabindex="0">
+                        <div class="tab-pane flex-column bg-white p-4" id="disregard-tab-pane" aria-labelledby="disregard-tab" tabindex="0">
                             <div class="list-group" id="complaints-archive-disregard">
                                 @php
                                     $archivedComplaints = $complaints->filter(function($complaint) {
@@ -604,7 +606,7 @@
 
                     <hr class="border-2">
 
-                    <div class="list-group" id="complaints-archive">
+                    <div class="list-group" id="complaints-non">
                         @php
                             $archivedComplaints = $complaints->filter(function($complaint) {
                                 return ($complaint->status == 'Non-Conforming');
@@ -615,41 +617,39 @@
                             <p class="text-center text-secondary m-0">No non-conforming complaints!</p>
                         @else
                             @foreach ($complaints as $complaint)
-                                @if ($complaint->status === 'Non-Conforming')
-                                    <a href="complaint/{{ $complaint->id }}" class="list-group-item complaint-link" aria-current="true" data-id="{{ $complaint->id }}">
-                                        <div class="d-flex w-100 justify-content-between">
-                                            <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 70, $end = "...") }}</h5>
-                                            <small class="text-secondary">{{ $complaint->updated_at->diffForHumans() }}</small>
-                                        </div>
+                                <a href="complaint/{{ $complaint->id }}" class="list-group-item complaint-link" aria-current="true" data-id="{{ $complaint->id }}">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 70, $end = "...") }}</h5>
+                                        <small class="text-secondary">{{ $complaint->updated_at->diffForHumans() }}</small>
+                                    </div>
 
-                                        <p class="mb-2">
-                                            @switch ($complaint->complaint_type)
-                                                @case(1)
-                                                    Slow service
-                                                    @break
-                                                @case(2)
-                                                    Unruly/disrespectful personnel
-                                                    @break
-                                                @case(3)
-                                                    No response
-                                                    @break
-                                                @case(4)
-                                                    Error/s on request
-                                                    @break
-                                                @case(5)
-                                                    Delayed issuance of request
-                                                    @break
-                                                @case(6)
-                                                    Others (Specific issue)
-                                                    @break
-                                            @endswitch
-                                        </p>
+                                    <p class="mb-2">
+                                        @switch ($complaint->complaint_type)
+                                            @case(1)
+                                                Slow service
+                                                @break
+                                            @case(2)
+                                                Unruly/disrespectful personnel
+                                                @break
+                                            @case(3)
+                                                No response
+                                                @break
+                                            @case(4)
+                                                Error/s on request
+                                                @break
+                                            @case(5)
+                                                Delayed issuance of request
+                                                @break
+                                            @case(6)
+                                                Others (Specific issue)
+                                                @break
+                                        @endswitch
+                                    </p>
 
-                                        <small class="text-secondary" style="font-size: 12px;">
-                                            <h6><span class="badge text-bg-danger rounded-pill">Non-Conforming</span></h6>
-                                        </small>
-                                    </a>
-                                @endif
+                                    <small class="text-secondary" style="font-size: 12px;">
+                                        <h6><span class="badge text-bg-danger rounded-pill">Non-Conforming</span></h6>
+                                    </small>
+                                </a>
                             @endforeach
                         @endif
                     </div>
@@ -684,6 +684,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="text-secondary-emphasis m-0">Accounts Management</h5>
                         <div class="d-flex gap-2">
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteOffice">Delete Office</button>
                             <button class="btn btn-danger" onclick="showOffice()">Create Office</button>
                             <button class="btn btn-danger" onclick="showAccount()">Create Account</button>
                         </div>
@@ -748,18 +749,13 @@
                                     @csrf
 
                                     <select class="form-select rounded-start" name="cstatus" id="cstatus">
-                                        <option value="default" selected disabled>-- Status --</option>
                                         <option value="Processing">Legitimate</option>
                                         <option value="Non-Conforming">Non-conformity</option>
                                         <option value="Inquiry">Inquiry</option>
+                                        <option class="d-none" id="istatus" value="Closed">Closed</option>
                                     </select>
 
-                                    <select class="form-select rounded-start visually-hidden" name="cstatus" id="istatus">
-                                        <option value="Inquiry" selected>Open</option>
-                                        <option value="Closed">Closed</option>
-                                    </select>
-
-                                    <button class="btn btn-danger" type="submit">Update Status</button>
+                                    <button class="btn btn-danger" type="button" data-bs-toggle="modal" data-bs-target="#submitStatus">Update Status</button>
                                 </form>
                             </div>
                         </div>
@@ -793,7 +789,7 @@
 
                                 <div class="d-flex gap-2" id="complaintBtns">
                                     <button class="btn btn-danger flex-fill" id="btn-memo">Create Memo</button>
-                                    <button class="btn btn-danger flex-fill" id="btn-ccf">Create Customer Complaint Form</button>
+                                    <button class="btn btn-danger flex-fill" id="btn-ccf">Customer Complaint Form</button>
                                 </div>
                             </div>
                         </div>
@@ -977,7 +973,7 @@
             </div>
         </div>
 
-        <!-- <div class="modal fade" id="notifications" role="dialog" tabindex="-1" aria-labelledby="notifications" aria-hidden="true">
+        <div class="modal fade" id="notifications" role="dialog" tabindex="-1" aria-labelledby="notifications" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -985,7 +981,9 @@
                     </div>
 
                     <div class="modal-body">
-                        There are <span class="fw-bold">{{ $new_complaints->count() }}</span> new complaints.
+                        There are <span class="fw-bold">{{ $new_complaints->count() }}</span> new complaints. <br>
+                        There are <span class="fw-bold">{{ $returned->count() }}</span> returned complaints. <br>
+                        There are <span class="fw-bold">{{ $closedc->count() }}</span> recently closed complaints.
                     </div>
 
                     <div class="modal-footer">
@@ -993,7 +991,66 @@
                     </div>
                 </div>
             </div>
-        </div> -->
+        </div>
+
+        <div class="modal fade" id="deleteOffice" role="dialog" tabindex="-1" aria-labelledby="deleteOffice" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="userModalName">Choose an office to delete</h1>
+                    </div>
+
+                    <form class="modal-body" method="post" action="{{ route('office-delete') }}" id="deleteOfficeForm">
+                        @csrf
+                        @method('DELETE')
+                        <select class="form-select" name="deleteoffice" id="deleteoffice">
+                            @foreach ($offices as $office)
+                                @if ($office->id != 1 && $office->id != 2)
+                                    <option value="{{ $office->id }}">
+                                        {{ $office->office_name }}
+                                    </option>
+                                @endif
+                            @endforeach
+                        </select>
+                    </form>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-danger" type="submit" onclick="document.getElementById('deleteOfficeForm').submit()">Confirm</button>
+                        <button class="btn btn-danger" type="button" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="submitStatus" role="dialog" tabindex="-1" aria-labelledby="submitStatus" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="userModalName">Update Status</h1>
+                    </div>
+
+                    <div class="modal-body">
+                        Update the status of this complaint?
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-danger" type="submit" onclick="document.getElementById('complaint-form').submit()">Confirm</button>
+                        <button class="btn btn-secondary" type="button" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if ($seen)
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    var modal = new bootstrap.Modal(document.getElementById("notifications"), {});
+                    document.onreadystatechange = function () {
+                        modal.show();
+                    };
+                });
+            </script>
+        @endif
 
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
@@ -1040,6 +1097,9 @@
                         break;
                     case 'Processing':
                         document.getElementById('btn-processing').click();
+                        break;
+                    case 'Inquiry':
+                        document.getElementById('btn-inquiry').click();
                         break;
                     case 'Non-Conforming':
                         document.getElementById('btn-non').click();
@@ -1139,6 +1199,38 @@
                             }
                         }
                         break;
+                    case 4:
+                        var input = document.getElementById('search-non');
+                        var filter = input.value.toUpperCase();
+                        var list = document.getElementById('complaints-non').getElementsByTagName('a');
+
+                        for (var i = 0; i < list.length; i++) {
+                            var item = list[i];
+                            var content = item.textContent || item.innerText;
+
+                            if (content.toUpperCase().indexOf(filter) > -1) {
+                                list[i].style.display = "";
+                            } else {
+                                list[i].style.display = "none";
+                            }
+                        }
+                        break;
+                    case 5:
+                        var input = document.getElementById('search-inquiry');
+                        var filter = input.value.toUpperCase();
+                        var list = document.getElementById('complaints-inquiry').getElementsByTagName('a');
+
+                        for (var i = 0; i < list.length; i++) {
+                            var item = list[i];
+                            var content = item.textContent || item.innerText;
+
+                            if (content.toUpperCase().indexOf(filter) > -1) {
+                                list[i].style.display = "";
+                            } else {
+                                list[i].style.display = "none";
+                            }
+                        }
+                        break;
                     default:
                         break;
                 }  
@@ -1221,14 +1313,13 @@
                                     $('#cstatus').val(data.status);
 
                                     if (data.status == 'Inquiry') {
-                                        $('#istatus').removeClass('visually-hidden');
-                                        $('#cstatus').addClass('visually-hidden');
+                                        $('#istatus').removeClass('d-none');
                                     } else {
-                                        $('#istatus').addClass('visually-hidden');
-                                        $('#cstatus').removeClass('visually-hidden');
+                                        $('#istatus').addClass('d-none');
                                     }
                                 } else {
                                     $('#cstatus').val('default');
+                                    $('#istatus').addClass('d-none');
                                 }
 
                                 if (data.status == 'Processing' || data.status == 'Closed') {
@@ -1242,15 +1333,20 @@
                                 $('#ctype').val(data.type);
                                 $('#cemail').val(data.email);
                                 $('#cnumber').val(data.number);
-                                $('#cevidence').attr('src', "{{ Storage::url('') }}" + data.evidence);
+                                $('#cevidence').attr('src', "/public/storage/" + data.evidence);
                                 
 
-                                if (data.status == 'Pending') {
+                                if (data.status == 'Pending' || data.status == 'Non-Conforming' || data.status == 'Inquiry') {
                                     $('#btn-memo').prop('disabled', true);
                                     $('#btn-ccf').prop('disabled', true);
                                 } else {
                                     $('#btn-memo').prop('disabled', false);
-                                    $('#btn-memo').text('View Memo');
+                                    if (data.has_memo) {
+                                        $('#btn-memo').text('View Memo');
+                                    } else {
+                                        $('#btn-memo').text('Create Memo');
+                                    }
+
                                     if (data.has_memo) {
                                         $('#btn-ccf').prop('disabled', false);
                                     } else {
@@ -1258,24 +1354,22 @@
                                     }
                                 }
 
-                                if (data.status == 0 || data.status == 3) {
-                                    document.getElementById('complaintBtns').classList.add('visually-hidden');
-                                } else { 
-                                    document.getElementById('complaintBtns').classList.remove('visually-hidden');
-                                }
-
-                                if (data.status == 'Pending') {
+                                if (data.has_memo) {
                                     $('#btn-memo').on('click', function () {
-                                        window.location.href = 'complaint/memo/' + complaintId;
+                                        window.location.href = 'complaint/memo/print/' + complaintId;
                                     });
                                 } else {
                                     $('#btn-memo').on('click', function () {
-                                        window.location.href = 'complaint/memo/print/' + complaintId;
+                                        window.location.href = 'complaint/memo/' + complaintId;
                                     });
                                 }
 
                                 $('#btn-ccf').on('click', function () {
-                                    window.location.href = 'complaint/form/' + complaintId;
+                                    if (data.status == 'Closed') {
+                                        window.location.href = 'complaint/form/print/' + complaintId;
+                                    } else {
+                                        window.location.href = 'complaint/form/' + complaintId;
+                                    }
                                 });
 
                                 const complaintTab = document.getElementById('btn-complaint');
@@ -1295,10 +1389,45 @@
             }
         
             function printDashboard() {
-                const content = document.getElementById('table-dashboard').innerHTML;
+                let content = document.getElementById('table-dashboard').outerHTML;
+                let printWindow = window.open('', '', 'width=800, height=600');
 
-                document.body.innerHTML = content;
-                window.print();
+                printWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                        <title>Print</title>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+                    </head>
+                    <body style="padding: 40px 40px 40px 40px;">
+                `);
+
+                printWindow.document.write(`
+                        <div class="row m-0 mb-3">
+                            <div class="col ps-1 p-2">
+                                <img src="{{ asset('image/wmsu_logo.jpg') }}" style="object-fit: cover; height: 50px;">
+                            </div>
+
+                            <div class="col-md-8 d-flex flex-column align-items-center ps-1 justify-content-center">
+                                <h5 class="m-0">QUALITY ASSURANCE OFFICE</h5>
+                                <p class="m-0 mb-1" style="font-size: x-small;">WMSU-QMSO-FR</p>
+                            </div>
+
+                            <div class="col ps-1">
+                                <p class="fw-bold m-0" style="font-size: x-small;">Date prepared: <br>{{ Carbon\Carbon::now() }}</p>
+                                <p class="m-0" style="font-size: x-small;"></p>
+                            </div>
+                        </div>
+
+                        ${ content }
+                    </body>
+                    </html>
+                `);
+
+                printWindow.document.close();
+                printWindow.print();
             }
         </script>
     </body>

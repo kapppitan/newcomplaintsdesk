@@ -45,7 +45,7 @@
 
             <div class="d-flex flex-column">
                 <div class="input-group">
-                    <input type="text" class="form-control border border-danger border-2" name="type" id="inputField">
+                    <input type="text" class="form-control border border-danger border-2" name="type" id="inputField" required>
                     <button class="btn bg-danger dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false" style="color: #ffffff;">
                         <span class="visually-hidden">Toggle Dropdown</span>
                     </button>
@@ -74,17 +74,21 @@
                     <option value="0" selected disabled>Choose Recipient...</option>
 
                     @foreach ($offices as $office)
-                        <option value="{{ $loop->count }}">{{ $office->office_name }}</option>
-              i   @endforeach
+                        @if ($office->id != 1 && $office->id != 2)
+                            <option value="{{ $office->id }}">{{ $office->office_name }}</option>
+                        @endif
+                    @endforeach
                 </select>
             </div>
 
             <div class="form-group mb-2">
                 <label class="form-label m-0" for="evidence">Evidence</label>
                 <input class="form-control border-danger border-2" name="file" type="file" required>
+                <p class="m-0 ps-1" style="font-size: x-small;">Upload file related to the complaint</p>
             </div>
 
-            <button class="btn btn-danger w-100 mt-auto" type="button" data-bs-toggle="modal" data-bs-target="#confirmComplaint">Submit Complaint</button>
+            <button class="visually-hidden" type="submit" id="submitButton"></button>
+            <button class="btn btn-danger w-100 mt-auto" type="button" onclick="submitForm()">Submit Complaint</button>
         </div>
     </form>
 
@@ -148,8 +152,18 @@
                 inputField.value = this.getAttribute('data-value');
             });
         });
-    </script>
 
+        function submitForm() {
+            var form = document.getElementById('complaintform');
+
+            if (form.checkValidity()) {
+                var modal = new bootstrap.Modal(document.getElementById('confirmComplaint'), {});
+                modal.show();
+            } else {
+                form.reportValidity();
+            }
+        }
+    </script>
 </body>
 
 </html>

@@ -25,7 +25,7 @@
             <div class="col-2 bg-danger p-3 d-flex flex-column">
                 <div class="d-flex align-items-center gap-2">
                     <img src="{{ asset('image/logo.png') }}" style="object-fit: fill; height: 50px; width: 50px;">
-                    <h4 class="text-light m-0 fs-5">Complaints Desk</h4>
+                    <h4 class="text-light m-0 fs-6">Quality Management System Office</h4>
                 </div>
                 
                 <hr class="border-light border-2">
@@ -48,6 +48,14 @@
                             <span class="badge"></span>
                         </button>
                     </li>
+
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link bg-danger text-light d-flex" id="btn-complaint" data-bs-toggle="pill" data-bs-target="#tab-archive" type="button" role="tab" aria-controls="btn-archive" aria-selected="false">
+                            <i class="bi-archive-fill me-2"></i>Archive
+                        </button>
+                    </li>
+
+                    <hr class="border-light border-2">
 
                     <li class="nav-item" role="presentation">
                         <button class="nav-link bg-danger text-light d-flex" id="btn-profile" data-bs-toggle="pill" data-bs-target="#tab-profile" type="button" role="tab" aria-controls="btn-profile" aria-selected="false">
@@ -151,7 +159,7 @@
                     <div class="list-group" id="complaints-pending">
                         @php
                             $pendingComplaints = $complaints->filter(function($complaint) {
-                                return $complaint->phase === 3 && $complaint->is_monitored;
+                                return $complaint->phase === 3 && $complaint->is_monitored && $complaint->is_closed != true;
                             });
                         @endphp
 
@@ -208,6 +216,65 @@
                     </div>
                 </div>
 
+                <div class="tab-pane flex-column" id="tab-archive" role="tabpanel" aria-labelledby="btn-archive" tabindex="0">
+                    <div class="d-flex align-items-center">
+                        <h5 class="text-secondary-emphasis m-0">Archived Cases</h5>
+                        <input class="form-control w-25 ms-auto" type="search" name="search" placeholder="Search..." onkeyup="search_complaint(1)" id="search-pending">
+                    </div>
+
+                    <hr class="border-2">
+
+                    <div class="list-group" id="complaints-pending">
+                        @php
+                            $pendingComplaints = $complaints->filter(function($complaint) {
+                                return $complaint->is_closed;
+                            });
+                        @endphp
+
+                        @if ($pendingComplaints->isEmpty())
+                            <p class="text-center text-secondary m-0">No monitored complaints yet!</p>
+                        @else
+                            @foreach ($complaints as $complaint)
+                                <a href="corrective/{{$complaint->id}}" class="list-group-item complaint-link" data-toggle="tab" aria-current="true" data-id="{{ $complaint->id }}">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">{{ \Illuminate\Support\Str::limit($complaint->details, 70, $end = "...") }}</h5>
+                                        <small class="text-secondary">{{ $complaint->updated_at->diffForHumans() }}</small>
+                                    </div>
+
+                                    <p class="mb-2">
+                                        @switch ($complaint->complaint_type)
+                                            @case(1)
+                                                Slow service
+                                                @break
+                                            @case(2)
+                                                Unruly/disrespectful personnel
+                                                @break
+                                            @case(3)
+                                                No response
+                                                @break
+                                            @case(4)
+                                                Error/s on request
+                                                @break
+                                            @case(5)
+                                                Delayed issuance of request
+                                                @break
+                                            @case(6)
+                                                Others (Specific issue)
+                                                @break
+                                        @endswitch
+                                    </p>
+
+                                    <small class="text-secondary" style="font-size: 12px;">
+                                        <h6>
+                                            <span class="badge text-bg-danger rounded-pill">Closed</span>
+                                        </h6>
+                                    </small>
+                                </a>
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
+
                 <div class="tab-pane flex-column" id="tab-profile" role="tabpanel" aria-labelledby="btn-profile" tabindex="0">
                     <h5 class="text-secondary-emphasis">Profile</h5>
                     <hr class="border-2">
@@ -234,78 +301,37 @@
                         <button class="btn btn-danger w-25" type="submit">Update</button>
                     </form>
                 </div>
-
-                <!-- <div class="tab-pane flex-column" id="tab-complaint" role="tabpanel" aria-labelledby="btn-complaint" tabindex="0">
-                    <div class="d-flex justify-content-between">
-                        <a href="">Back</a>
-                        <a href="" class="btn btn-secondary">Print</a>
-                    </div>
-
-                    <hr class="border-2">
-
-                    <div class="row h-100">
-                        <div class="col-sm-8">
-                            <div class="container-fluid d-flex flex-column gap-2 bg-white p-2 rounded-1" id="corrective_action">
-                                <label class="form-label" for="details">Corrective Action</label>
-                                
-                                <div class="row">
-                                    <div class="col">
-                                        <textarea class="form-control" style="resize: none;" rows="12" name="corrective_action" id="" disabled></textarea>
-                                    </div>
-
-                                    <div class="col d-flex flex-column gap-2">
-                                        <div class="form-group">
-                                            <label class="form-label" for="corrective_date">Implementation Date</label>
-                                            <input class="form-control" type="date" name="corrective_date" disabled>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="form-label" for="corrective_effect">Effectiveness</label>
-                                            <input class="form-control" type="text" name="corrective_effect" disabled>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="form-label" for="corrective_period">Monitoring Period</label>
-                                            <input class="form-control" type="text" name="corrective_period" disabled>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="form-label" for="corrective_responsible">Responsible</label>
-                                            <input class="form-control" type="text" name="corrective_responsible" disabled>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="d-flex flex-column">
-                                    <label for="feedback">Comment</label>
-                                    <textarea class="form-control" name="feedback" id="feedback"></textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-4 d-flex flex-column gap-3">
-                            <form class="input-group" method="post" id="status">
-                                @csrf
-
-                                <select class="form-select" name="cstatus" id="cstatus">
-                                    <option value="0">Open</option>
-                                    <option value="1">Closed</option>
-                                </select>
-
-                                <button class="btn btn-danger">Update Status</button>
-                            </form>
-
-                            <form class="d-flex flex-column gap-2" method="post" id="monitor">
-                                @csrf
-
-                                <a class="btn btn-danger flex-fill" id="view-complaint-form">View Complaint Form</a>
-                                <button class="btn btn-danger flex-fill">Monitor Complaint</button>
-                            </form>
-                        </div>
-                    </div>
-                </div> -->
             </div>
         </div>
+
+        <div class="modal fade" id="notifications" role="dialog" tabindex="-1" aria-labelledby="notifications" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="userModalName">Notification!</h1>
+                    </div>
+
+                    <div class="modal-body">
+                        There are <span class="fw-bold">{{ $new_complaints->count() }}</span> new complaints. <br>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if ($seen)
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    var modal = new bootstrap.Modal(document.getElementById("notifications"), {});
+                    document.onreadystatechange = function () {
+                        modal.show();
+                    };
+                });
+            </script>
+        @endif
 
         <script src="{{ asset('js/jquery-3.7.1.min.js') }}"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>

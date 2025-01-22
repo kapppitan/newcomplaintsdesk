@@ -48,6 +48,7 @@ Route::group(['middleware' => 'auth'], function() {
     Route::get('/user/{id}', 'App\Http\Controllers\OfficeController@get_user');
     Route::get('/complaints', 'App\Http\Controllers\OfficeController@get_complaints');
     Route::get('/corrective/{id}', 'App\Http\Controllers\ComplaintController@form_view');
+    Route::get('/get-complaints/{month}', 'App\Http\Controllers\OfficeController@getComplaintsByMonth');
 });
 
 
@@ -70,3 +71,4 @@ Route::post('/accept-not/{id}', 'App\Http\Controllers\ComplaintController@accept
 Route::post('/upload-file/{id}', 'App\Http\Controllers\ComplaintController@upload')->name('upload-file');
 Route::get('/download/{id}', 'App\Http\Controllers\ComplaintController@download')->name('download');
 Route::delete('/delete/users/{id}', 'App\Http\Controllers\OfficeController@delete_user')->name('user-delete');
+Route::delete('/delete/office/', 'App\Http\Controllers\OfficeController@delete_office')->name('office-delete');

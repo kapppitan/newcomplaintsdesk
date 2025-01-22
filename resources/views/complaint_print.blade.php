@@ -137,30 +137,29 @@
             <div class="row m-0">
                 <div class="col-md-1 px-1 p-0 border" style="width: 20px; font-size: x-small;">6</div>
                 <div class="col p-0 border">
+                    <div class="row m-0">
+                        <div class="col p-0 border text-center bg-secondary-subtle" style="font-size: x-small;">CORRECTIVE ACTION (CA)</div>
+                        <div class="col p-0 border text-center bg-secondary-subtle" style="font-size: x-small;">IMPLEMENTATION DATE</div>
+                        <div class="col p-0 border text-center bg-secondary-subtle" style="font-size: x-small;">MEASURE OF EFFECTIVENESS</div>
+                        <div class="col p-0 border text-center bg-secondary-subtle" style="font-size: x-small;">MONITORING PERIOD FOR CA</div>
+                        <div class="col p-0 border text-center bg-secondary-subtle" style="font-size: x-small;">RESPONSIBLE</div>
+                    </div>
+
                     @foreach ($corrective as $corr)
                         <div class="row m-0">
                             <div class="col p-0 border">
-                                <p class="text-center bg-secondary-subtle m-0 border border-bottom" style="font-size: x-small;">CORRECTIVE ACTION (CA)</p>
                                 <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ $corr->corrective_action }}</p>
                             </div>
-
                             <div class="col p-0 border">
-                                <p class="text-center bg-secondary-subtle px-3 m-0 border border-bottom" style="font-size: x-small;">IMPLEMENTATION DATE</p>
                                 <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ Carbon\Carbon::parse($corr->implementation_date)->format('F j, Y') }}</p>
                             </div>
-
                             <div class="col p-0 border">
-                                <p class="text-center bg-secondary-subtle px-3 m-0 border border-bottom" style="font-size: x-small;">MEASURE OF EFFECTIVENESS</p>
                                 <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ $corr->effectiveness }}</p>
                             </div>
-
                             <div class="col p-0 border">
-                                <p class="text-center bg-secondary-subtle px-3 m-0 border border-bottom" style="font-size: x-small;">MONITORING PERIOD FOR CA</p>
                                 <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ $corr->monitoring_period }}</p>
                             </div>
-
                             <div class="col p-0 border">
-                                <p class="text-center bg-secondary-subtle m-0 border border-bottom" style="font-size: x-small;">RESPONSIBLE</p>
                                 <p class="m-0 pb-3 ps-1" style="font-size: x-small;">{{ $corr->responsible }}</p>
                             </div>
                         </div>
@@ -231,8 +230,8 @@
                             <p class="m-0 ps-1 fw-bold border-bottom" style="font-size: x-small;">CUSTOMER FEEDBACK</p>
                             <p class="m-0 ps-1 pb-3 border-bottom" style="font-size: x-small;">{{ $form->feedback }}</p>
 
-                            <p class="m-0 ps-1 border-bottom" style="font-size: x-small;"><span class="fw-bold">Reported by:</span> {{ optional(\App\Models\User::where('id', $form->reported_by)->first())->username }}</p>
-                            <p class="m-0 ps-1 pb-3 border-bottom" style="font-size: x-small;"><span class="fw-bold">Date:</span> {{ $form->date_reported }}</p>
+                            <p class="m-0 ps-1 border-bottom" style="font-size: x-small;"><span class="fw-bold">Reported by:</span> {{ optional(\App\Models\User::where('id', $form->reported_by)->first())->name }}</p>
+                            <p class="m-0 ps-1 pb-3 border-bottom" style="font-size: x-small;"><span class="fw-bold">Date:</span> {{ Carbon\Carbon::parse($form->date_reported)->format('F j, Y') }}</p>
                         </div>
 
                         <div class="col p-0 ps-1 border-start">
@@ -255,19 +254,6 @@
             <div class="row m-0">
                 <div class="col-md-1 px-1 p-0 border" style="width: 20px; font-size: x-small;">11</div>
                 <div class="col p-0 border">
-                    <p class="m-0 ps-1 fw-bold" style="font-size: x-small">VERIFICATION OF EFFECTIVENESS OF ACTION:</p>
-                    <p class="m-0 ps-1 border-bottom" style="font-size: x-small">(Check implementation details. Record evidence of effectiveness, include date of next verification, if possible)</p>
-                    <div class="row m-0 border-bottom">
-                        <div class="col">
-
-                        </div>
-                        
-                        <div class="col border-start ps-1">
-                            <p class="m-0 fw-bold" style="font-size: x-small;">VERIFICATION EVIDENCE</p>
-                            <p class="m-0 pb-3" style="font-size: x-small;">test_evidence</p>
-                        </div>
-                    </div>
-
                     <div class="row m-0 border-bottom">
                         <div class="col ps-1">
                             <p class="fw-bold" style="font-size: x-small;">Verified by: <span class="fw-light">test_user</span></p>

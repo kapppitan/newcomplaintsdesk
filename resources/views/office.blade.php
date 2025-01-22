@@ -78,23 +78,19 @@
                     <hr class="border-2">
 
                     <div class="d-flex flex-column mb-5">
-                        <!-- <select class="form-select align-self-end w-25" id="filter">
-                            <option value="0">All</option>
-                            <option value="1">January</option>
-                            <option value="2">February</option>
-                            <option value="3">March</option>
-                            <option value="4">April</option>
-                            <option value="5">May</option>
-                            <option value="6">June</option>
-                            <option value="7">July</option>
-                            <option value="8">August</option>
-                            <option value="9">September</option>
-                            <option value="10">October</option>
-                            <option value="11">November</option>
-                            <option value="12">December</option>
-                        </select> -->
+                        <div class="container mb-3 d-flex align-items-center">
+                            <label for="monthDropdown" class="form-label m-0 me-2">Select Month</label>
+                            <select id="monthDropdown" class="form-select w-25 me-3">
+                                <option value="All">All</option>
+                                @foreach ($data['labels'] as $index => $month)
+                                    <option value="{{ $index + 1 }}">{{ $month }}</option>
+                                @endforeach
+                            </select>
 
-                        <canvas id="myChart"></canvas>
+                            <button class="btn btn-secondary ms-auto" onclick="printChart()">Print</button>
+                        </div>
+
+                        <canvas id="myChart" width="400" height="180"></canvas>
                     </div>
 
                     <div class="container text-center d-flex flex-column gap-4 mb-5">
@@ -103,21 +99,21 @@
                             <div class="d-flex py-2 bg-white rounded-bottom">
                                 <div class="d-flex flex-column w-50 py-3">
                                     <p class="fw-bold m-0">Processing</p>
-                                    <p class="m-0">{{ App\Models\Complaints::where('office_id', Auth::user()->office_id)->where('status', 1)->count() }}</p>
+                                    <p class="m-0">{{ App\Models\Complaints::where('office_id', Auth::user()->office_id)->where('status', 'Processing')->count() }}</p>
                                 </div>
 
                                 <div class="vr"></div>
 
                                 <div class="d-flex flex-column w-50 py-3">
                                     <p class="fw-bold m-0">Monitored</p>
-                                    <p class="m-0">{{ App\Models\Complaints::where('office_id', Auth::user()->office_id)->where('status', 2)->count() }}</p>
+                                    <p class="m-0">{{ App\Models\Complaints::where('office_id', Auth::user()->office_id)->where('is_monitored', true)->count() }}</p>
                                 </div>
 
                                 <div class="vr"></div>
 
                                 <div class="d-flex flex-column w-50 py-3">
                                     <p class="fw-bold m-0">Closed</p>
-                                    <p class="m-0">0</p>
+                                    <p class="m-0">{{ App\Models\Complaints::where('office_id', Auth::user()->office_id)->where('status', 'Closed')->count() }}</p>
                                 </div>
                             </div>
                         </div>
@@ -175,11 +171,11 @@
 
                                         <small class="text-secondary" style="font-size: 12px;">
                                             <h6>
-                                                @switch ($complaint->status)
-                                                    @case(1)
-                                                        <span class="badge text-bg-success rounded-pill">Processing</span>
-                                                        @break
-                                                @endswitch
+                                                <span class="badge text-bg-success rounded-pill">Processing</span>
+
+                                                @if ($complaint->updated_at && $complaint->updated_at->lt(\Carbon\Carbon::now()->subDays(15)))
+                                                    <p><span class="badge text-bg-success rounded-pill">Priority</span></p>
+                                                @endif
                                             </h6>
                                         </small>
                                     </a>
@@ -279,7 +275,7 @@
             </div>
         </div>
 
-        <!-- <div class="modal fade" id="notifications" role="dialog" tabindex="-1" aria-labelledby="notifications" aria-hidden="true">
+        <div class="modal fade" id="notifications" role="dialog" tabindex="-1" aria-labelledby="notifications" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -287,7 +283,7 @@
                     </div>
 
                     <div class="modal-body">
-                        There are <span class="fw-bold">0</span> new complaints.
+                        There are <span class="fw-bold">{{ $new_complaints->count() }}</span> new submitted complaints. <br>
                     </div>
 
                     <div class="modal-footer">
@@ -295,16 +291,29 @@
                     </div>
                 </div>
             </div>
-        </div> -->
+        </div>
+
+        @if ($seen)
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    var modal = new bootstrap.Modal(document.getElementById("notifications"), {});
+                    document.onreadystatechange = function () {
+                        modal.show();
+                    };
+                });
+            </script>
+        @endif
 
         <script src="{{ asset('js/jquery-3.7.1.min.js') }}"></script>
         <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 const ctx = document.getElementById('myChart').getContext('2d');
+                const dropdown = document.getElementById('monthDropdown');
 
+                // Initialize Chart
                 const lineChart = new Chart(ctx, {
                     type: 'bar',
                     data: {
@@ -312,7 +321,6 @@
                         datasets: [{
                             label: 'Sample Data',
                             data: @json($data['dataset']),
-                            fill: false,
                             backgroundColor: 'rgba(75, 192, 192, 0.2)',  // Light color for bars
                             borderColor: 'rgb(75, 192, 192)',  // Border color for bars
                             borderWidth: 1
@@ -335,6 +343,31 @@
                             }
                         }
                     }
+                });
+
+                // Update chart dynamically
+                dropdown.addEventListener('change', async function () {
+                    const selectedMonth = dropdown.value;
+
+                    let labels, dataset;
+
+                    if (selectedMonth === 'All') {
+                        // Use full year data
+                        labels = @json($data['labels']);
+                        dataset = @json($data['dataset']);
+                    } else {
+                        // Fetch daily data for the selected month
+                        const response = await fetch(`/get-complaints/${selectedMonth}`);
+                        const data = await response.json();
+                        labels = data.labels; // Days (1–30/31)
+                        dataset = data.dataset; // Complaints count per day
+                    }
+
+                    // Update chart
+                    lineChart.data.labels = labels;
+                    lineChart.data.datasets[0].data = dataset;
+                    lineChart.options.scales.x.title.text = selectedMonth === 'All' ? 'Months' : 'Days';
+                    lineChart.update();
                 });
             });
 
@@ -370,6 +403,22 @@
                     sessionStorage.setItem('notificationShown', 'true');
                 }
             });
+
+            function printChart() {
+                const chartCanvas = document.getElementById('myChart'); // Get the chart canvas element
+                const chartImage = chartCanvas.toDataURL("image/png"); // Convert chart to image
+
+                // Create a new window for the print view
+                const printWindow = window.open('', '', 'height=600,width=800');
+                
+                printWindow.document.write('<html><head><title>Print Chart</title></head><body style="padding: 40px 40px 40px 40px;">');
+                printWindow.document.write('<img src="' + chartImage + '" style="width: 100%; height: auto;"/>'); // Embed the chart image
+                printWindow.document.write('</body></html>');
+                
+                // Wait for the content to be fully loaded and then print
+                printWindow.document.close();
+                printWindow.print();
+            }
         </script>
     </body>
 </html>
